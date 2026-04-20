@@ -1,5 +1,7 @@
+from typing import Annotated
+
 from pydantic import field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -15,7 +17,10 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
     # CORS accepts comma-separated values, JSON list strings, or a real list.
-    CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://localhost"]
+    CORS_ORIGINS: Annotated[list[str], NoDecode] = [
+        "http://localhost:3000",
+        "http://localhost",
+    ]
 
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
