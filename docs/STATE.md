@@ -1,4 +1,4 @@
-# STATE: [PROJECT_NAME] Development Tracker
+# STATE: Docassist Development Tracker
 
 > **Status legend**
 > `⏳ pending` — not started

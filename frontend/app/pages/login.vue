@@ -36,7 +36,7 @@ async function handleLogin() {
 <template>
   <div class="w-full max-w-sm bg-white rounded-xl shadow-md p-8 space-y-6">
     <div class="text-center">
-      <h1 class="text-2xl font-bold text-indigo-600">[PROJECT_NAME]</h1>
+      <h1 class="text-2xl font-bold text-indigo-600">Docassist</h1>
       <p class="text-sm text-gray-500 mt-1">Sign in to your account</p>
     </div>
 

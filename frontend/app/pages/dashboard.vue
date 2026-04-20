@@ -10,7 +10,7 @@ definePageMeta({ layout: 'default' });
     <div>
       <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ t('welcome') }}</h1>
       <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-        [PROJECT_NAME] — add your project description here
+        Docassist — add your project description here
       </p>
     </div>
 

@@ -27,9 +27,9 @@ async def lifespan(app: FastAPI):  # type: ignore[type-arg]
 
 
 app = FastAPI(
-    title="[PROJECT_NAME]",
+    title="Docassist",
     version="0.1.0",
-    description="[PROJECT_DESCRIPTION]",
+    description="",
     lifespan=lifespan,
 )
 
