@@ -55,6 +55,7 @@ None
 
 | Date   | Event                                         |
 |--------|-----------------------------------------------|
+| 2026-04-20 | `SPEC.md` refreshed for current template; MVP narrowed and deferred scope moved to `docs/SPEC_POST_MVP.md` |
 | [DATE] | Project initialized from sdd-template         |
 
 <!-- Add entries: [date]: PHASE_N completed / spec changed / blocker resolved -->

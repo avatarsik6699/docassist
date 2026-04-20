@@ -6,6 +6,29 @@
 
 ---
 
+## v1.0 — 2026-04-20 — SPEC Reset For Current Template
+
+**Type**: spec-change
+**Author**: Codex
+**Triggered by**: Derived project still used an older, implementation-heavy spec format after the template evolved
+
+### Changes
+- `SPEC.md` was rewritten to match the current template intent: product problem, users, MVP scope, rules, constraints, and release strategy
+- MVP scope was reduced to the core psychiatry monitoring loop instead of the broader platform vision
+- Deferred functionality was preserved in new file `docs/SPEC_POST_MVP.md` instead of being removed
+
+### Affected Phases
+- None yet; no concrete `PHASE_XX.md` files exist in this repository
+
+### Contract Updates
+- `CONTEXT.md` unchanged
+- No implementation contract was asserted by this doc-only reset
+
+### Notes
+The old spec contained many details that belong in architecture, testing, or later phase contracts rather than the product spec itself.
+
+---
+
 ## v1.0 — [DATE] — Initial Template
 
 **Type**: initial-setup
