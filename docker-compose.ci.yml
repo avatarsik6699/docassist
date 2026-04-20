@@ -2,6 +2,10 @@
 # no bind mounts, no UID constraints) and publishes the frontend port
 # so Playwright can reach it on localhost:3000.
 services:
+  backend:
+    ports:
+      - "8000:8000"
+
   frontend:
     ports:
       - "3000:3000"
