@@ -5,7 +5,7 @@ stay aligned with `/phase-gate`, CI, and the phase docs.
 
 ## Quality Policy
 
-- Required checks before commit: `pytest`, frontend type-check, `vitest`, smoke check, and Playwright when the full stack is already up
+- Required checks before commit: migrations, `pytest`, frontend type-check, `vitest`, smoke check, and Chromium Playwright against the full stack
 - Required checks before deploy: migrations applied, CI green, Docker images build successfully, and a manual browser sanity pass on the target environment
 - Risk-based testing rule: docs-only changes may skip code tests; backend or frontend behavior changes should run the affected local checks; contract, auth, migration, or infra changes should run the full gate
 
@@ -17,7 +17,7 @@ stay aligned with `/phase-gate`, CI, and the phase docs.
 | Types | `cd frontend && pnpm nuxt prepare && pnpm typecheck` | Nuxt, Vue, and generated types stay aligned | Required before commit when frontend code changes |
 | Backend tests | `uv run pytest tests/ -v` | API/auth behavior and DB interactions | Required before commit when backend code changes |
 | Frontend unit | `cd frontend && pnpm nuxt prepare && pnpm test` | Store and component behavior | Required before commit when frontend code changes |
-| E2E | `cd frontend && pnpm test:e2e` | Full user-facing flow against the running stack | Required by the gate when `db`, `redis`, `backend`, `frontend`, and `nginx` are already healthy |
+| E2E | `cd frontend && pnpm test:e2e` | Full user-facing flow in Chromium against the running stack | Required by the gate after it starts `db`, `redis`, `backend`, `frontend`, and `nginx` |
 | Smoke | `curl -s http://localhost:8000/api/v1/health` | Backend is reachable and DB-backed health responds | Required before commit for application phases |
 
 ## Commands
@@ -25,11 +25,13 @@ stay aligned with `/phase-gate`, CI, and the phase docs.
 ```bash
 uv run ruff check .
 cd frontend && pnpm lint
+docker compose exec -T backend uv run alembic upgrade head
 cd frontend && pnpm nuxt prepare && pnpm typecheck
 uv run pytest tests/ -v
 cd frontend && pnpm nuxt prepare && pnpm test
 cd frontend && pnpm test:e2e
 curl -s http://localhost:8000/api/v1/health
+./scripts/phase-gate.sh [XX]
 ```
 
 ## Testing Notes

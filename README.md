@@ -47,7 +47,7 @@ flowchart TD
     Spec --> Init["/phase-init N<br/>scaffolds PHASE_N.md, contracts, and file plan from SPEC"]
     Init --> Fill[Architect reviews scaffold<br/>creates feat/phase-N branch]
     Fill --> Impl[AI implements scope on feat/phase-N]
-    Impl --> Gate["/phase-gate N<br/>automated checks"]
+    Impl --> Gate["/phase-gate N<br/>bootstraps stack + automated checks"]
     Gate --> Review[Architect manual verification<br/>adds checkbox notes to PHASE_N.md if needed]
     Review --> Fix[AI resolves unchecked review notes]
     Fix --> Ready{"/phase-gate N<br/>re-run after fixes:<br/>all checks + review notes resolved?"}
@@ -73,7 +73,7 @@ Affected phases are marked `⚠️ NEEDS_REVIEW` in `docs/STATE.md` until resolv
 |---------|-------------|
 | `/spec-sync [description]` | Immediately after editing [docs/SPEC.md](docs/SPEC.md) |
 | `/phase-init [N]` | To scaffold the next [docs/PHASE_XX.md](docs/PHASE_TEMPLATE.md) from SPEC |
-| `/phase-gate [N]` | Before committing — runs automated checks and also fails if `Architect Review Notes` still contain unchecked items |
+| `/phase-gate [N]` | Before committing — starts the local stack if needed, runs the automated checks, and also fails if `Architect Review Notes` still contain unchecked items |
 | `/context-update [N]` | After the gate passes — bumps `CONTEXT.md` version, updates `STATE.md` and `CHANGELOG.md` |
 
 Skill definitions live under [.claude/skills/](.claude/skills/).
@@ -108,14 +108,14 @@ Portable workflow playbooks live under [docs/workflows/](docs/workflows/README.m
 
 - **Architect defines intent, phase-init scaffolds contracts, AI fills them in.** The architect writes SPEC, reviews the phase scaffold, and approves merges. `phase-init` generates the phase contract and file plan, and the AI produces code, tests, and doc updates strictly inside that scope.
 - **Contracts beat conventions.** Every phase has an explicit contract (scope, files, endpoints, types, env vars). Nothing implicit.
-- **Gates, not promises.** Quality is proven by a passing `/phase-gate` report (unit + type + e2e + smoke + resolved architect review notes), not by the AI claiming "looks good".
+- **Gates, not promises.** Quality is proven by a passing `/phase-gate` report (migrations + unit + type + Chromium e2e + smoke + resolved architect review notes), not by the AI claiming "looks good".
 - **Docs are alive.** `CONTEXT.md` is the single source of truth for what exists; `STATE.md` tracks progress; `CHANGELOG.md` records why things changed. `CONTEXT.md` must never lag more than one phase behind.
 
 ### Manual Verification Loop
 
 `/phase-gate` is intentionally lightweight for manual review:
 
-1. Run `/phase-gate N` to get the automated baseline.
+1. Run `/phase-gate N` to get the automated baseline. In the reference stack, this should bootstrap the local Docker Compose stack and can be implemented with `./scripts/phase-gate.sh N`.
 2. Manually verify the phase as the architect.
 3. Record any findings in `docs/PHASE_XX.md` under `Architect Review Notes` as simple unchecked checklist items.
 4. Have the AI fix those unchecked items and mark them resolved.

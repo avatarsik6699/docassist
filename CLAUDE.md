@@ -79,7 +79,7 @@ These skills are defined here and shipped to derived projects:
 | Skill | Purpose |
 |-------|---------|
 | `spec-sync` | Sync SPEC.md changes across docs — **for derived projects** |
-| `phase-gate` | Run gate checks before commit — **for derived projects** |
+| `phase-gate` | Start the local stack, run migrations plus gate checks, and fail on unresolved review notes — **for derived projects** |
 | `context-update` | Update CONTEXT.md after phase — **for derived projects** |
 | `phase-init` | Scaffold a new PHASE_XX.md, filling scope, Contracts, and Files from SPEC.md — **for derived projects** |
 

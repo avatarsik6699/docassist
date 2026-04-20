@@ -1,3 +1,5 @@
 <script setup lang="ts">
-await navigateTo('/dashboard');
+const authStore = useAuthStore();
+
+await navigateTo(authStore.isAuthenticated ? '/dashboard' : '/login');
 </script>

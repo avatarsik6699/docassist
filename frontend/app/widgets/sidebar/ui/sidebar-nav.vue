@@ -31,7 +31,7 @@ const isDark = computed({
     <div
       class="text-lg font-bold text-primary-600 dark:text-primary-400 mb-6 flex items-center justify-between"
     >
-      <span>[PROJECT_NAME]</span>
+      <span>Docassist</span>
       <UButton
         :icon="isDark ? 'i-heroicons-moon-20-solid' : 'i-heroicons-sun-20-solid'"
         color="neutral"

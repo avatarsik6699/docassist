@@ -1,97 +1,128 @@
+import { computed, ref } from 'vue';
 import { navigateTo, useNuxtApp } from '#imports';
 import { defineStore } from 'pinia';
 import { safeCookie } from '@shared/lib/safe-cookie';
 
 export const AUTH_COOKIE_CONFIG = {
-  key: 'app_token',
+  key: 'docassist_token',
   version: '1.0',
 };
 
 export interface AuthUser {
   id: string;
   email: string;
-  role: 'admin' | 'architect' | 'expert' | 'ai_agent';
+  role: 'admin' | 'doctor' | 'patient';
   is_active: boolean;
 }
 
-interface AuthState {
-  user: AuthUser | null;
-  isLoading: boolean;
-  error: string | null;
-}
+const readTokenFromCookie = () =>
+  safeCookie.getItem<string>({
+    keyWithVersion: AUTH_COOKIE_CONFIG,
+  });
 
-export const useAuthStore = defineStore('auth', {
-  state: (): AuthState => ({
-    user: null,
-    isLoading: false,
-    error: null,
-  }),
+export const useAuthStore = defineStore('auth', () => {
+  const user = ref<AuthUser | null>(null);
+  const token = ref<string | null>(null);
+  const isLoading = ref(false);
+  const error = ref<string | null>(null);
 
-  getters: {
-    isAuthenticated: (): boolean =>
-      !!safeCookie.getItem<string>({ keyWithVersion: AUTH_COOKIE_CONFIG }),
-    token: (): string | undefined =>
-      safeCookie.getItem<string>({ keyWithVersion: AUTH_COOKIE_CONFIG }),
-  },
+  const isAuthenticated = computed(() => !!token.value);
 
-  actions: {
-    loadFromStorage() {
-      // Cookies are automatically loaded, nothing to do here
-    },
+  function loadFromStorage(): string | undefined {
+    token.value = readTokenFromCookie() ?? null;
+    return token.value ?? undefined;
+  }
 
-    async login(email: string, password: string): Promise<void> {
-      this.isLoading = true;
-      this.error = null;
+  async function login(email: string, password: string): Promise<void> {
+    isLoading.value = true;
+    error.value = null;
+    try {
+      const { $api } = useNuxtApp();
+      const data = await $api<{ access_token: string; token_type: string }>('/api/v1/auth/login', {
+        method: 'POST',
+        body: {
+          email,
+          password,
+        },
+      });
+
+      safeCookie.setItem({
+        keyWithVersion: AUTH_COOKIE_CONFIG,
+        value: data.access_token,
+        options: {
+          maxAge: 60 * 60,
+          path: '/',
+          sameSite: 'lax',
+        },
+      });
+
+      token.value = data.access_token;
+      await fetchMe(data.access_token);
+    } catch (err: unknown) {
+      error.value = err instanceof Error ? err.message : 'Login failed';
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function fetchMe(accessToken = token.value): Promise<AuthUser | null> {
+    if (!accessToken) {
+      user.value = null;
+      return null;
+    }
+
+    try {
+      const { $api } = useNuxtApp();
+      const data = await $api<AuthUser>('/api/v1/auth/me', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      user.value = data;
+      return data;
+    } catch {
+      await logout(false);
+      return null;
+    }
+  }
+
+  async function logout(redirect = true): Promise<void> {
+    const currentToken = token.value;
+
+    if (currentToken) {
       try {
         const { $api } = useNuxtApp();
-
-        // Use URLSearchParams because FastAPI OAuth2 expects application/x-www-form-urlencoded
-        const data = await $api<{ access_token: string; token_type: string }>(
-          '/api/v1/auth/login',
-          {
-            method: 'POST',
-            body: {
-              email: email,
-              password: password,
-            },
-          }
-        );
-
-        safeCookie.setItem({
-          keyWithVersion: AUTH_COOKIE_CONFIG,
-          value: data.access_token,
-          options: {
-            maxAge: 60 * 60 * 24 * 7, // 7 days
-            path: '/',
+        await $api('/api/v1/auth/logout', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${currentToken}`,
           },
         });
-
-        await this.fetchMe();
-      } catch (err: unknown) {
-        this.error = err instanceof Error ? err.message : 'Login failed';
-        throw err;
-      } finally {
-        this.isLoading = false;
-      }
-    },
-
-    async fetchMe(): Promise<void> {
-      if (!this.isAuthenticated) return;
-      try {
-        const { $api } = useNuxtApp();
-        const data = await $api<AuthUser>('/api/v1/auth/me');
-        this.user = data;
       } catch {
-        // Token expired or invalid — clear auth
-        this.logout();
+        // Logout is best-effort because the current implementation is stateless.
       }
-    },
+    }
 
-    logout() {
-      this.user = null;
-      this.error = null;
-      safeCookie.removeItem({ keyWithVersion: AUTH_COOKIE_CONFIG });
-      navigateTo('/login');
-    },
-  },
+    token.value = null;
+    user.value = null;
+    error.value = null;
+    safeCookie.removeItem({ keyWithVersion: AUTH_COOKIE_CONFIG });
+
+    if (redirect) {
+      await navigateTo('/login');
+    }
+  }
+
+  return {
+    user,
+    isLoading,
+    error,
+    token,
+    isAuthenticated,
+    loadFromStorage,
+    login,
+    fetchMe,
+    logout,
+  };
 });

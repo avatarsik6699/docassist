@@ -1,15 +1,15 @@
 from __future__ import annotations
 
-from uuid import UUID
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.auth import Role, create_access_token, require_role, verify_password
+from app.core.auth import create_access_token, get_current_user, verify_password
 from app.db.models.user import User
 from app.db.session import get_db
-from app.schemas.auth import LoginRequest, TokenResponse, UserOut
+from app.schemas.auth import LoginRequest, LogoutResponse, TokenResponse, UserOut
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -37,21 +37,11 @@ async def login(body: LoginRequest, db: AsyncSession = Depends(get_db)) -> Token
 
 
 @router.get("/me", response_model=UserOut)
-async def me(
-    payload: dict = Depends(require_role(*list(Role))),
-    db: AsyncSession = Depends(get_db),
-) -> UserOut:
-    user_id = UUID(payload["sub"])
-    result = await db.execute(select(User).where(User.id == user_id))
-    user = result.scalar_one_or_none()
-    if user is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+async def me(user: Annotated[User, Depends(get_current_user)]) -> UserOut:
     return UserOut.model_validate(user)
 
 
-@router.post("/logout", status_code=status.HTTP_200_OK)
-async def logout(
-    _payload: dict = Depends(require_role(*list(Role))),
-) -> dict:
+@router.post("/logout", response_model=LogoutResponse, status_code=status.HTTP_200_OK)
+async def logout(_user: Annotated[User, Depends(get_current_user)]) -> LogoutResponse:
     # Stateless logout. Add Redis token blacklist here when needed.
-    return {"detail": "Logged out successfully"}
+    return LogoutResponse()

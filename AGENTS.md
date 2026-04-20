@@ -49,7 +49,7 @@ The workflow protocols in `.claude/skills/` are still useful even outside Claude
 Portable interpretation:
 - `spec-sync`: protocol for propagating `docs/SPEC.md` changes
 - `phase-init`: protocol for scaffolding a new `docs/PHASE_XX.md`
-- `phase-gate`: protocol for running validation checks before commit
+- `phase-gate`: protocol for starting the local stack, running migrations plus required validation checks, and failing if `Architect Review Notes` still contain unchecked items
 - `context-update`: protocol for syncing `docs/CONTEXT.md`, `docs/STATE.md`, and `docs/CHANGELOG.md`
 
 If an agent runtime does not support those skills natively, execute the corresponding markdown procedure manually.

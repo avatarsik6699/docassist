@@ -55,19 +55,21 @@ Workflow:
 1. Resolve the target phase from arguments or from `docs/STATE.md`.
 2. Read the phase file's Gate Checks section and `Architect Review Notes`.
 3. Check Docker infrastructure state.
-4. Run backend tests.
-5. Run `pnpm nuxt prepare` so `.nuxt/` types exist.
-6. Run frontend type checks.
-7. Run frontend unit tests.
-8. Run Playwright end-to-end tests only if the full stack is already up.
-9. Run the smoke check.
-10. Mark architect review as failed if any checklist item in `Architect Review Notes` is still unchecked.
-11. Produce a structured gate report with PASS/FAIL and exact failing areas.
+4. Start the full Docker stack and wait for health.
+5. Run migrations inside the backend container so `.env`-backed credentials are used.
+6. Run backend tests.
+7. Run `pnpm nuxt prepare` so `.nuxt/` types exist.
+8. Run frontend type checks.
+9. Run frontend unit tests.
+10. Run Playwright end-to-end tests against the local stack.
+11. Run the smoke check.
+12. Mark architect review as failed if any checklist item in `Architect Review Notes` is still unchecked.
+13. Produce a structured gate report with PASS/FAIL and exact failing areas.
 
 Rules:
 
 - Do not edit code.
 - Do not commit.
 - Do not hide failures behind early exit when later checks can still provide useful signal.
-- If e2e preconditions are missing, report that clearly rather than masking it.
 - Do not return PASS while unchecked architect review notes remain.
+- Prefer `./scripts/phase-gate.sh [XX]` when possible.

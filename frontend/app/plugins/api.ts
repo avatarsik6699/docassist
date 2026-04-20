@@ -4,9 +4,12 @@ import { AUTH_COOKIE_CONFIG } from '@features/auth/model/auth-store';
 
 export default defineNuxtPlugin(() => {
   const config = useRuntimeConfig();
+  const configuredApiBase = ((config.public.apiBase as string) || 'http://localhost:8000/api/v1')
+    .replace(/\/$/, '')
+    .replace(/\/api\/v1$/, '');
 
   const api = $fetch.create({
-    baseURL: (config.public.apiBase as string) || 'http://localhost:8000',
+    baseURL: configuredApiBase,
 
     onRequest({ options }) {
       const token = safeCookie.getItem<string>({
@@ -29,10 +32,8 @@ export default defineNuxtPlugin(() => {
 
     onResponseError({ response }) {
       if (response.status === 401) {
-        // Clear token
         safeCookie.removeItem({ keyWithVersion: AUTH_COOKIE_CONFIG });
 
-        // Redirect to login if on client
         if (import.meta.client) {
           navigateTo('/login');
         }

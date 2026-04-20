@@ -13,7 +13,7 @@
 
 | Phase    | Status     | Tag    | Gate | Expert | Notes                  |
 |----------|------------|--------|------|--------|------------------------|
-| PHASE_01 | ⏳ pending | v0.1.0 | ⬜   | -      | Foundation & Core Data |
+| PHASE_01 | ⏳ pending | v0.1.0 | ⬜   | -      | Foundation, auth, user roles, project skeleton |
 
 <!-- Add new rows here via /phase-init N -->
 

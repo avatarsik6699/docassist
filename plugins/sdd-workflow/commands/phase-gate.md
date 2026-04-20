@@ -15,9 +15,9 @@ Run the repository's gate checks and return an honest PASS/FAIL report.
 
 ## Plan
 
-1. Check container health.
-2. Run backend validation, then `pnpm nuxt prepare`, frontend type-check, and frontend unit tests.
-3. Run Playwright only if the full stack is already healthy.
+1. Start the full Docker stack with the repository `.env` and wait for it to become healthy.
+2. Run migrations in the backend container, then backend validation, `pnpm nuxt prepare`, frontend type-check, and frontend unit tests.
+3. Run Playwright against the local stack.
 4. Run the smoke test.
 5. Summarize everything in one gate report.
 6. Return PASS only if automated checks are green and architect review notes have no unchecked items.
@@ -27,6 +27,7 @@ Run the repository's gate checks and return an honest PASS/FAIL report.
 Follow the canonical playbook:
 
 - `docs/workflows/phase-gate.md`
+- `./scripts/phase-gate.sh [XX]`
 
 Use the matching skill:
 

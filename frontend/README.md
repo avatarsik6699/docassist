@@ -147,7 +147,7 @@ Requires a running application (dev or Docker):
 
 ```bash
 # Docker stack
-docker-compose up -d
+docker compose up -d
 
 # Install browsers (first time only)
 pnpm test:e2e:install
@@ -173,7 +173,8 @@ Default base URL: `http://localhost:3000`. Override with `PLAYWRIGHT_BASE_URL`.
 The `/phase-gate` skill requires a ✅ e2e row before commit — unit tests alone do NOT clear the gate.
 
 - **One spec per user-facing flow** introduced in the phase. Specs live under [tests/e2e/](tests/e2e/).
-- **Run against the full Docker stack** — `db`, `redis`, `backend`, `frontend`, `nginx` must all be healthy. The gate skill will refuse to run Playwright otherwise; it does NOT auto-start the stack.
+- **Run against the full Docker stack** — `db`, `redis`, `backend`, `frontend`, and `nginx` must all be ready. The gate helper now starts the stack itself and uses the repository `.env` so Compose and migrations share the same credentials.
+- **Chromium is the canonical E2E browser** for this template. Keep the suite green there first; add extra browser coverage only if the derived project explicitly needs it.
 - **Reporter config** is pinned in [playwright.config.ts](playwright.config.ts) to emit three outputs: `list` (CLI), `html` (clickable report), and `junit` at `test-results/junit.xml` (parsed by the gate skill).
 - **Debugging a failure**: open `playwright-report/index.html`, or run with the inspector: `pnpm test:e2e:ui`.
 - **Test IDs are kebab-case** to match the `testIdAttribute: 'data-testid'` config.

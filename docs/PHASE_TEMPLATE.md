@@ -93,12 +93,11 @@ Run `/phase-gate [XX]` before committing.
 
 ```bash
 # 1. Infrastructure
-docker compose up -d db redis
-docker compose ps  # db + redis must show: healthy
+docker compose up -d
+docker compose ps  # db, redis, backend, frontend must show healthy; nginx must be running
 
 # 2. Migrations
-DATABASE_URL=postgresql+asyncpg://app_user:changeme@localhost:5432/myapp \
-  uv run alembic upgrade head
+docker compose exec -T backend uv run alembic upgrade head
 
 # 3. Backend tests
 uv run pytest tests/ -v
@@ -112,12 +111,12 @@ cd frontend
 pnpm exec tsc --noEmit
 pnpm vitest run
 
-# 6. E2E (Playwright) — requires full stack healthy:
-#    db, redis, backend, frontend, nginx
-docker compose up -d            # if not already running
-docker compose ps               # verify all five services are healthy
+# 6. E2E (Playwright) — Chromium only, against the full stack:
 pnpm test:e2e                   # parses test-results/junit.xml
 # Report lives at frontend/playwright-report/index.html
+
+# Portable helper
+./scripts/phase-gate.sh [XX]
 ```
 
 ---

@@ -8,11 +8,11 @@
 
 1. **Scope Lock**: Do only what is specified in the active `docs/PHASE_XX.md`. Do not assume future phases.
 2. **No Guessing**: If a requirement is genuinely ambiguous and risky, ask a concise terminal question instead of inventing behavior.
-3. **Gates First**: Before each commit, run the phase-gate workflow for the current phase. Commit only if the report is PASS. Automated green is not enough if `Architect Review Notes` still has unchecked items.
+3. **Gates First**: Before each commit, run the phase-gate workflow for the current phase. It should start the local Docker Compose stack if needed, run migrations, and execute the required checks. Commit only if the report is PASS. Automated green is not enough if `Architect Review Notes` still has unchecked items.
 4. **Atomic Commits**: Use `feat|fix|chore|docs|test|refactor(scope): description`. One commit = one logical task.
 5. **Security**: No hardcodes, no secrets in code. Use `.env`, environment variables, and typed settings.
 6. **Context Sync**: After completing each phase, run the context-update workflow to refresh `docs/CONTEXT.md`, `docs/STATE.md`, and `docs/CHANGELOG.md`.
-7. **E2E First**: For every user-facing feature touched in a phase, add or update a Playwright spec under `frontend/tests/e2e/`. Unit tests alone do not clear the gate.
+7. **E2E First**: For every user-facing feature touched in a phase, add or update a Playwright spec under `frontend/tests/e2e/`. In the reference stack, the canonical phase-gate browser is Chromium. Unit tests alone do not clear the gate.
 
 ## Stack Conventions
 
@@ -61,9 +61,10 @@ Different agent runtimes may expose these as slash commands, skills, prompts, or
 
 - `spec-sync`: run immediately after modifying `docs/SPEC.md`
 - `phase-init`: scaffold the next `docs/PHASE_XX.md`
-- `phase-gate`: run validation checks before commit and fail if `Architect Review Notes` still has unchecked items
+- `phase-gate`: start the local stack, run migrations and required validation checks before commit, and fail if `Architect Review Notes` still have unchecked items
 - `context-update`: sync `CONTEXT.md`, `STATE.md`, and `CHANGELOG.md` after a completed phase
 
 If your runtime supports slash commands or native skills, map them to these workflows. If not, execute the corresponding protocol manually from the repository docs.
 
 Canonical portable playbooks should live in `docs/workflows/`.
+For the FastAPI + Nuxt reference stack, projects may expose this workflow through a helper such as `./scripts/phase-gate.sh N`.

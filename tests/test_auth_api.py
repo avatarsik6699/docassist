@@ -79,8 +79,29 @@ async def test_me_without_token(client: AsyncClient) -> None:
 async def test_logout_with_valid_token(client: AsyncClient, admin_headers: dict) -> None:
     resp = await client.post("/api/v1/auth/logout", headers=admin_headers)
     assert resp.status_code == 200
+    assert resp.json() == {"message": "logged out"}
 
 
 async def test_logout_without_token(client: AsyncClient) -> None:
     resp = await client.post("/api/v1/auth/logout")
     assert resp.status_code == 401
+
+
+async def test_inactive_user_cannot_login(client: AsyncClient, db_session: AsyncSession) -> None:
+    from uuid import uuid4
+
+    user = User(
+        email=f"inactive_{uuid4().hex[:8]}@example.com",
+        hashed_password=hash_password("testpass123"),
+        role=UserRole.patient,
+        is_active=False,
+    )
+    db_session.add(user)
+    await db_session.commit()
+
+    resp = await client.post(
+        "/api/v1/auth/login",
+        json={"email": user.email, "password": "testpass123"},
+    )
+
+    assert resp.status_code == 403

@@ -22,3 +22,7 @@ class UserOut(BaseModel):
     email: str
     role: str
     is_active: bool
+
+
+class LogoutResponse(BaseModel):
+    message: str = "logged out"

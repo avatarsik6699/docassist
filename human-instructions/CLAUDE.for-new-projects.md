@@ -8,12 +8,12 @@
 
 1. **Scope Lock**: Do only what is specified in the active `docs/PHASE_XX.md`. Do not assume the realization of future phases.
 2. **No Guessing**: If the requirement is ambiguous → ask a question in the terminal. Don't write code "to suit your taste".
-3. **Gates First**: Before each commit, run `/phase-gate N`. Commit only if the gate report is ✅ PASS. Automated green is not enough if `Architect Review Notes` still contains unchecked items.
+3. **Gates First**: Before each commit, run `/phase-gate N`. In the reference stack, the gate should start the local Docker Compose stack if needed, run migrations, and execute the required checks. Commit only if the gate report is ✅ PASS. Automated green is not enough if `Architect Review Notes` still contains unchecked items.
 4. **Atomic Commits**: The format is `feat|fix|chore|docs|test|refactor(scope): description`. 1 commit = 1 logical task.
 5. **Security**: No hardcodes, no secrets in the code. Use `.env`, `os.getenv()`, `Pydantic Settings`.
 6. **Output**: First, the plan → waiting `✅` → code → tests → commit. Don't skip the steps.
 7. **Context**: After completing each phase, run `/context-update N` to update `docs/CONTEXT.md`, `docs/STATE.md`, and `docs/CHANGELOG.md`.
-8. **E2E First**: For every user-facing feature touched in a phase, add or update a Playwright spec under `frontend/tests/e2e/`. The `/phase-gate` e2e row must be ✅ before commit. Unit tests alone do not clear the gate.
+8. **E2E First**: For every user-facing feature touched in a phase, add or update a Playwright spec under `frontend/tests/e2e/`. In the reference stack, the canonical `/phase-gate` e2e browser is Chromium, and that row must be ✅ before commit. Unit tests alone do not clear the gate.
 
 ---
 
@@ -146,7 +146,7 @@ When `docs/SPEC.md` is modified:
 | Command | When to use |
 |---------|-------------|
 | `/spec-sync [description]` | Immediately after modifying `docs/SPEC.md` |
-| `/phase-gate [N]` | Before committing phase work |
+| `/phase-gate [N]` | Before committing phase work; in the reference stack this should bootstrap the local stack and run migrations plus the required checks |
 | `/context-update [N]` | After phase gate passes |
 | `/phase-init [N]` | To scaffold the next phase document |
 
@@ -159,7 +159,7 @@ When `docs/SPEC.md` is modified:
 2.  /phase-init N       → creates docs/PHASE_N.md scaffold
 3.  Architect fills Contracts + Files sections in PHASE_N.md
 4.  AI implements scope (on feat/phase-N branch)
-5.  /phase-gate N       → automated checks baseline
+5.  /phase-gate N       → bootstraps local stack if needed, then runs the automated baseline
 6.  Architect manual verification → add unchecked items to `Architect Review Notes` if needed
 7.  /phase-gate N       → ✅ PASS only when automated checks are green and review notes are fully checked off
 8.  git commit          → feat(phase-N): [description]

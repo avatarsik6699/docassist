@@ -8,9 +8,8 @@ from app.db.base import Base, TimestampMixin, UUIDMixin
 
 class UserRole(enum.StrEnum):
     admin = "admin"
-    architect = "architect"
-    expert = "expert"
-    ai_agent = "ai_agent"
+    doctor = "doctor"
+    patient = "patient"
 
 
 class User(UUIDMixin, TimestampMixin, Base):
@@ -18,7 +17,5 @@ class User(UUIDMixin, TimestampMixin, Base):
 
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
-    role: Mapped[UserRole] = mapped_column(
-        Enum(UserRole, name="userrole"), default=UserRole.architect, nullable=False
-    )
+    role: Mapped[UserRole] = mapped_column(Enum(UserRole, name="userrole"), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
