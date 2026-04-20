@@ -6,6 +6,29 @@
 
 ---
 
+## v1.2 — 2026-04-20 — Phase 01 Contract Synced
+
+**Type**: breaking-change
+**Author**: Codex (`/context-update`)
+**Triggered by**: Phase 01 implementation landed and replaced stale template contract details in `CONTEXT.md`
+
+### Changes
+- Synced the Phase 01 foundation contract for the live template repository
+- Confirmed the `users` model now uses the real role taxonomy: `admin`, `doctor`, `patient`
+- Locked in the active auth surface: health check, login, current-user lookup, and logout stub
+- Recorded the seeded admin account and active Nuxt auth shell as part of the repository memory
+
+### Affected Phases
+- PHASE_01 — implementation synchronized into the shared contract snapshot; phase closure still blocked by failing E2E expectations
+
+### Contract Updates
+- `CONTEXT.md` bumped from `v1.0` to `v1.2`
+- Replaced the stale template role enum in `core_models`
+- Refreshed phase pointers and repository notes to reflect the shipped foundation
+
+### Notes
+The version bump is breaking rather than additive because the previous `CONTEXT.md` snapshot still described placeholder role values from the template instead of the implemented Phase 01 contract. The current gate blocker is in Playwright, where two tests still expect the login submit button to be enabled before form input is provided.
+
 ## v1.0 — 2026-04-20 — SPEC Reset For Current Template
 
 **Type**: spec-change

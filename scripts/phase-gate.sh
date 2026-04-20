@@ -163,6 +163,22 @@ warm_up_stack() {
   return 1
 }
 
+ensure_stack_ready() {
+  local reason="${1:-stack check}"
+
+  if ! wait_for_stack 120; then
+    echo "stack did not become healthy after ${reason}" >&2
+    return 1
+  fi
+
+  if ! warm_up_stack; then
+    echo "warm-up endpoints did not respond after ${reason}" >&2
+    return 1
+  fi
+
+  return 0
+}
+
 count_architect_notes() {
   python3 - "$PHASE_FILE" <<'PY'
 from pathlib import Path
@@ -259,17 +275,12 @@ set -e
 
 STACK_OUTPUT=""
 if run_cmd STACK_OUTPUT docker compose up -d; then
-  if wait_for_stack 120; then
-    if warm_up_stack; then
-      STATUS_INFRA="PASS"
-      DETAIL_INFRA="docker compose stack is up; db/redis/backend/frontend healthy, nginx running"
-    else
-      STATUS_INFRA="FAIL"
-      DETAIL_INFRA="stack became healthy, but frontend/backend warm-up endpoints did not respond"
-    fi
+  if ensure_stack_ready "docker compose up -d"; then
+    STATUS_INFRA="PASS"
+    DETAIL_INFRA="docker compose stack is up; db/redis/backend/frontend healthy, nginx running"
   else
     STATUS_INFRA="FAIL"
-    DETAIL_INFRA="stack did not become healthy within 120s"
+    DETAIL_INFRA="stack did not become healthy and warm after docker compose up -d"
   fi
 else
   STATUS_INFRA="FAIL"
@@ -304,8 +315,21 @@ DETAIL_PYTEST="$(printf '%s' "$PYTEST_OUTPUT" | extract_pytest_counts)"
 
 NUXT_OUTPUT=""
 if run_cmd NUXT_OUTPUT bash -lc 'cd frontend && pnpm nuxt prepare'; then
-  STATUS_NUXT="PASS"
-  DETAIL_NUXT="generated .nuxt"
+  FRONTEND_RESTART_OUTPUT=""
+  STACK_REFRESH_OUTPUT=""
+  if run_cmd FRONTEND_RESTART_OUTPUT docker compose restart frontend \
+    && run_cmd STACK_REFRESH_OUTPUT ensure_stack_ready "frontend restart after pnpm nuxt prepare"; then
+    STATUS_NUXT="PASS"
+    DETAIL_NUXT="generated .nuxt, restarted frontend, and re-warmed frontend stack"
+  else
+    STATUS_NUXT="FAIL"
+    DETAIL_NUXT="$(
+      {
+        printf '%s\n' "$FRONTEND_RESTART_OUTPUT"
+        printf '%s\n' "$STACK_REFRESH_OUTPUT"
+      } | tail -n 1
+    )"
+  fi
 else
   STATUS_NUXT="FAIL"
   DETAIL_NUXT="$(printf '%s' "$NUXT_OUTPUT" | tail -n 1)"
@@ -329,7 +353,8 @@ fi
 DETAIL_VITEST="$(printf '%s' "$VITEST_OUTPUT" | extract_vitest_counts)"
 
 E2E_OUTPUT=""
-if run_cmd E2E_OUTPUT bash -lc 'cd frontend && pnpm test:e2e'; then
+rm -f frontend/test-results/junit.xml
+if run_cmd E2E_OUTPUT bash -lc 'cd frontend && CI=1 pnpm test:e2e'; then
   STATUS_E2E="PASS"
 else
   STATUS_E2E="FAIL"

@@ -8,10 +8,10 @@
 |-------|-------|
 | Phase | `01` |
 | Title | Foundation, auth, user roles, project skeleton |
-| Status | `⏳ pending` |
+| Status | `✅ done` |
 | Tag | `v0.1.0` |
 | Depends on | None (first phase) |
-| CONTEXT.md version | `v1.0` |
+| CONTEXT.md version | `v1.2` |
 
 ---
 
@@ -200,10 +200,10 @@ feat(phase-01): foundation auth roles and project skeleton
 
 ## Post-Phase Checklist
 
-- [ ] All automated gate checks green
-- [ ] All architect review notes resolved
-- [ ] `docs/CONTEXT.md` updated — run `/context-update 01`
-- [ ] `docs/STATE.md` phase row updated to `✅ done`
-- [ ] `docs/CHANGELOG.md` entry added (if CONTEXT.md version bumped)
+- [x] All automated gate checks green
+- [x] All architect review notes resolved
+- [x] `docs/CONTEXT.md` updated — run `/context-update 01`
+- [x] `docs/STATE.md` phase row updated to `✅ done`
+- [x] `docs/CHANGELOG.md` entry added (if CONTEXT.md version bumped)
 - [ ] Committed atomically on `feat/phase-01` branch
 - [ ] Tag created after merge to develop: `git tag -a v0.1.0 -m "Phase 01: Foundation, auth, user roles, project skeleton"`

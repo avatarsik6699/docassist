@@ -1,13 +1,13 @@
 {
   "_meta": {
-    "version": "v1.0",
+    "version": "v1.2",
     "format": "SDD CONTEXT.md — Single Source of Truth for AI agent",
     "update_rule": "Bump version on schema/API/type changes. Use /context-update skill after each phase.",
     "version_scheme": "patch (v1.0→v1.1) = additive only; minor (v1.1→v1.2) = breaking change"
   },
 
-  "captured_at": "[DATE]",
-  "phase_completed": null,
+  "captured_at": "2026-04-20",
+  "phase_completed": "01",
   "phase_in_progress": null,
 
   "stack": {
@@ -21,7 +21,7 @@
   },
 
   "core_models": [
-    "User (id UUID PK, email UNIQUE, hashed_password, role ENUM[admin/architect/expert/ai_agent], is_active, created_at, updated_at)"
+    "User (id UUID PK, email UNIQUE, hashed_password, role ENUM[admin/doctor/patient], is_active, created_at, updated_at)"
   ],
 
   "endpoints_active": [
@@ -54,5 +54,5 @@
     "default_admin": "admin@example.com / changeme123 (migration 0001)"
   },
 
-  "notes": "Initial template state. Run /context-update N after each phase is completed."
+  "notes": "Phase 01 contract is now active: backend foundation, JWT auth flow, seeded admin account, and Nuxt auth shell are implemented and validated by a passing /phase-gate 01. The gate now re-warms the frontend after nuxt prepare and runs Playwright in CI mode for deterministic Chromium coverage."
 }
