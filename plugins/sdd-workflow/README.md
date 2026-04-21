@@ -14,30 +14,14 @@ This plugin makes the repository's SDD workflow visible to Codex as native:
 - `/context-update`
 - `/spec-sync`
 
-The plugin mirrors the intent of the existing Claude setup in `.claude/skills/`,
-but uses Codex-native plugin discovery through:
+The plugin mirrors the existing Claude setup in `.claude/skills/`, but both layers are wrappers around the canonical workflow docs in [docs/workflows/](../../docs/workflows/README.md).
 
-- [`.agents/plugins/marketplace.json`](../../.agents/plugins/marketplace.json)
-- [`.codex-plugin/plugin.json`](./.codex-plugin/plugin.json)
+## Documentation lookup
 
-## Context7
+Project runtime rules live in [AGENTS.md](../../AGENTS.md). One-time MCP and CLI setup guidance lives in [human-instructions/agent_setup_once.md](../../human-instructions/agent_setup_once.md).
 
-The plugin declares a project-local `context7` MCP server in [`.mcp.json`](./.mcp.json).
-In this workspace, Codex also has a global MCP entry already configured, which is
-the most reliable option when the `context7-mcp` binary is not on PATH.
-
-Recommended docs lookup order for this project:
-
-1. `context7` via MCP
-2. `ctx7` CLI fallback
-3. Official docs only when Context7 is unavailable
-
-See:
-
-- [docs/AGENT_SETUP.md](../../docs/AGENT_SETUP.md)
-- [AGENTS.md](../../AGENTS.md)
+The plugin declares a project-local `context7` MCP server in [`.mcp.json`](./.mcp.json). In this workspace, Codex may also have a global MCP entry configured, which is often the most reliable option when the local `context7-mcp` binary is not on PATH.
 
 ## Restart requirement
 
-After adding or changing plugin files, restart Codex in this workspace so the
-plugin, slash commands, and marketplace entry are reloaded.
+After adding or changing plugin files, restart Codex in this workspace so the plugin, slash commands, and marketplace entry are reloaded.

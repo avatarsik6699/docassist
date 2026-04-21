@@ -2,7 +2,7 @@
 
 > Product intent for the derived project.
 > Keep this document focused on what we are building, for whom, and which rules are non-negotiable.
-> Put implementation detail in `docs/ARCHITECTURE.md`, `docs/STACK.md`, `docs/TESTING.md`, and phase files.
+> Put stack specifics in `docs/STACK.md`, durable decisions in `docs/DECISIONS.md`, recurring pitfalls in `docs/KNOWN_GOTCHAS.md`, and exact implementation contracts in phase files.
 > When this file changes, run the `spec-sync` workflow.
 
 ## Metadata
@@ -218,33 +218,3 @@ Required MVP safety signals:
 | `PHASE_03` | Medication tracking and adherence logging |
 | `PHASE_04` | Questionnaire assignment, submission, and scoring for `PHQ-9` and `GAD-7` |
 | `PHASE_05` | Doctor patient view with recent history and safety highlighting |
-| `PHASE_06` | Production hardening, reminders, and MVP release readiness |
-
-### 7.2 Scope Discipline
-
-If a feature does not materially improve the core between-visit monitoring loop for the first psychiatry workflow, it should stay out of MVP and move to the deferred scope file.
-
----
-
-## 8. Open Questions To Resolve During Planning
-
-- Should admins be fully blind to clinical content, or do they need narrowly scoped support access?
-- Is email enough for the first reminder flow, or should reminders wait until after MVP?
-- Should the first release allow one patient to be linked to more than one doctor? The current recommendation is no.
-- Which side effect severity threshold should count as a doctor-facing critical alert in production?
-
----
-
-## 9. Summary
-
-`Docassist` should start as a focused psychiatry monitoring product, not as a full clinical platform.
-
-The MVP should deliver:
-
-- patient-reported questionnaires
-- medication adherence logging
-- side effect reporting
-- a doctor-facing patient summary
-- a minimal set of reliable safety signals
-
-Everything more ambitious should remain visible, but explicitly deferred.

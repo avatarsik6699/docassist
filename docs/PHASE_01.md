@@ -34,13 +34,6 @@ This phase establishes the MVP foundation required by the product constraints in
 - [ ] Build the login flow and an authenticated dashboard shell for post-login navigation
 - [ ] Add client-side auth state management that persists JWT state safely across page loads
 
-### Tests
-- [ ] `uv run pytest tests/ -v` — all pass
-- [ ] `cd frontend && pnpm vitest run` — all pass
-- [ ] `cd frontend && pnpm exec tsc --noEmit` — 0 errors
-- [ ] `cd frontend && pnpm test:e2e` — all pass (requires full Docker stack up)
-- [ ] At least one Playwright spec covers the login flow and authenticated dashboard redirect
-
 ---
 
 ## Files
@@ -150,31 +143,14 @@ Run `/phase-gate 01` before committing.
 - Automated checks are green
 - All architect review items below are resolved (checked off)
 
+Use the standard infrastructure, migration, test, prep, typecheck, unit, and e2e commands from [docs/STACK.md](./STACK.md#gate-commands).
+
+Phase-specific smoke override:
+
 ```bash
-# 1. Infrastructure
-docker compose up -d
-docker compose ps  # db, redis, backend, frontend must show healthy; nginx must be running
-
-# 2. Migrations
-docker compose exec -T backend uv run alembic upgrade head
-
-# 3. Backend tests
-uv run pytest tests/ -v
-
-# 4. Smoke test
 curl -s http://localhost:8000/api/v1/health
 # expected: {"status":"ok"}
 
-# 5. Frontend unit + type check
-cd frontend
-pnpm exec tsc --noEmit
-pnpm vitest run
-
-# 6. E2E (Playwright) — Chromium only, against the full stack:
-pnpm test:e2e                   # parses test-results/junit.xml
-# Report lives at frontend/playwright-report/index.html
-
-# Portable helper
 ./scripts/phase-gate.sh 01
 ```
 
@@ -188,6 +164,7 @@ If manual verification found nothing, keep the default checked line below.
 
 - [x] When I log in for the first time, enter my email and password, and then click Sign in, nothing happens after that. When I click Sign in again, it's only the second time that I go to the main page "/dashboard". We need to fix this behavior - the transition to the page / dashboard should occur immediately, after correctly entering the email and password and after the first click on the Sign in button.
 - [x] I think it's worth refining the e2e tests and covering all the basic scenarios. Right now, e2e tests are not doing any useful work. This includes testing the flow of logging in and logging out.
+
 ---
 
 ## Atomic Commit Message

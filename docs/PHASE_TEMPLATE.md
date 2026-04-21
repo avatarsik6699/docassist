@@ -30,13 +30,6 @@
 ### Frontend
 - [ ] [task]
 
-### Tests
-- [ ] `uv run pytest tests/ -v` — all pass
-- [ ] `cd frontend && pnpm vitest run` — all pass
-- [ ] `cd frontend && pnpm exec tsc --noEmit` — 0 errors
-- [ ] `cd frontend && pnpm test:e2e` — all pass (requires full Docker stack up)
-- [ ] At least one Playwright spec covers each user-facing flow introduced in this phase
-
 ---
 
 ## Files
@@ -56,29 +49,19 @@
 > This section is the source of truth for `/context-update`. Fill it in **before** handing to AI.
 
 ### New DB tables / columns
-~~~
-table_name(col TYPE NOT NULL, ...)
-~~~
+<!-- Replace with a schema block when this phase introduces any. -->
 None
 
 ### New API endpoints
-| Method | Path | Auth | Response |
-|--------|------|------|----------|
-| `GET` | `/api/v1/[path]` | JWT | `{"field": type}` |
-
+<!-- Replace with a table when this phase introduces any. -->
 None
 
 ### New TypeScript types / Pinia stores
-```typescript
-// [TypeName] — describe what it represents
-```
+<!-- Replace with a code block or concise list when this phase introduces any. -->
 None
 
 ### New env vars (add to `.env.example`)
-| Key | Example value | Required |
-|-----|---------------|----------|
-| `VAR_NAME` | `value` | yes |
-
+<!-- Replace with a table when this phase introduces any. -->
 None
 
 ---
@@ -91,31 +74,23 @@ Run `/phase-gate [XX]` before committing.
 - Automated checks are green
 - All architect review items below are resolved (checked off)
 
+Use the commands in [docs/STACK.md](./STACK.md#gate-commands) as the source of truth for:
+- infrastructure/bootstrap
+- migrations
+- backend tests
+- frontend prep and typecheck
+- frontend unit tests
+- e2e
+- the default smoke check
+
+If this phase needs a custom smoke target or other phase-specific note, record it here:
+
 ```bash
-# 1. Infrastructure
-docker compose up -d
-docker compose ps  # db, redis, backend, frontend must show healthy; nginx must be running
-
-# 2. Migrations
-docker compose exec -T backend uv run alembic upgrade head
-
-# 3. Backend tests
-uv run pytest tests/ -v
-
-# 4. Smoke test
+# Optional phase-specific smoke override
 curl -s http://localhost:8000/api/v1/[your-endpoint]
 # expected: [describe expected response]
 
-# 5. Frontend unit + type check
-cd frontend
-pnpm exec tsc --noEmit
-pnpm vitest run
-
-# 6. E2E (Playwright) — Chromium only, against the full stack:
-pnpm test:e2e                   # parses test-results/junit.xml
-# Report lives at frontend/playwright-report/index.html
-
-# Portable helper
+# Optional helper for the reference stack
 ./scripts/phase-gate.sh [XX]
 ```
 

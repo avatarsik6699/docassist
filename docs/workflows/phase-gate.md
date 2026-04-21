@@ -9,23 +9,24 @@ Inputs:
 Required reads:
 
 - `docs/PHASE_XX.md`
+- `docs/STACK.md` (`Gate Commands` section)
 - optionally `docs/STATE.md` if no phase number was given
 
 Procedure:
 
 1. Identify the target phase file.
 2. Read the phase file's Gate Checks section.
-3. Read the phase file's `Architect Review Notes` section and count unchecked items.
-4. Ensure a project `.env` exists so Docker Compose and containerized commands use the same credentials the app uses.
-5. Start the full Docker Compose stack with `docker compose up -d`.
-6. Wait for `db`, `redis`, `backend`, and `frontend` to become healthy, and for `nginx` to be running.
-7. Run Alembic migrations inside the backend container so `.env`-backed credentials are used consistently.
-8. Run backend tests.
-9. Run `pnpm nuxt prepare` so `.nuxt/` types exist for frontend checks.
-10. Run frontend type checks.
-11. Run frontend unit tests.
-12. Run Playwright e2e against the local stack.
-13. Run the smoke test from the phase file, or the default health check if none is specified.
+3. Read `docs/STACK.md#gate-commands` and treat it as the authoritative command source for the standard gate steps.
+4. Read the phase file's `Architect Review Notes` section and count unchecked items.
+5. Ensure a project `.env` exists so Docker Compose and containerized commands use the same credentials the app uses.
+6. Run the stack command listed for infrastructure/bootstrap and verify the services are ready.
+7. Run the migrations command from `docs/STACK.md`.
+8. Run the backend test command from `docs/STACK.md`.
+9. Run the frontend prep command from `docs/STACK.md`.
+10. Run the frontend typecheck command from `docs/STACK.md`.
+11. Run the frontend unit test command from `docs/STACK.md`.
+12. Run the e2e command from `docs/STACK.md`.
+13. Run the smoke command from `docs/STACK.md`, unless the phase file defines a phase-specific smoke override.
 14. Produce a table report with one row per check, include the architect review status, and return overall PASS only if automated checks are green and there are no unchecked architect review items.
 
 Rules:
@@ -36,6 +37,7 @@ Rules:
 - do use the repository's `.env` when bringing up Docker services or running containerized checks
 - do bring up the full stack yourself; the gate should verify the real end-to-end environment, not depend on a manual pre-step
 - do not treat unchecked architect review notes as informational; they block PASS until resolved
+- if the stack changes, update `docs/STACK.md`, not this workflow
 
 Preferred command:
 
@@ -43,7 +45,7 @@ Preferred command:
 ./scripts/phase-gate.sh [XX]
 ```
 
-If you cannot use the helper script in the current runtime, follow the same sequence manually.
+For the FastAPI + Nuxt reference stack, the helper above implements the `Gate Commands` contract. If you cannot use the helper script in the current runtime, follow the same sequence manually by reading `docs/STACK.md`.
 
 Done when:
 

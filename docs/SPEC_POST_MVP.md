@@ -65,9 +65,8 @@ These were present in the earlier draft and may still be useful later:
 For the current template, these details should usually live elsewhere:
 
 - product intent in `docs/SPEC.md`
-- architecture and boundaries in `docs/ARCHITECTURE.md`
-- validation commands in `docs/TESTING.md`
 - stack specifics in `docs/STACK.md`
+- recurring pitfalls in `docs/KNOWN_GOTCHAS.md`
 - exact implementation contracts in `docs/PHASE_XX.md`
 
 ## 7. Candidate Release Order After MVP

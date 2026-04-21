@@ -8,7 +8,7 @@
 
 1. **Scope Lock**: Do only what is specified in the active `docs/PHASE_XX.md`. Do not assume future phases.
 2. **No Guessing**: If a requirement is genuinely ambiguous and risky, ask a concise terminal question instead of inventing behavior.
-3. **Gates First**: Before each commit, run the phase-gate workflow for the current phase. It should start the local Docker Compose stack if needed, run migrations, and execute the required checks. Commit only if the report is PASS. Automated green is not enough if `Architect Review Notes` still has unchecked items.
+3. **Gates First**: Before each commit, run the phase-gate workflow for the current phase. It must use the commands defined in `docs/STACK.md#gate-commands`. Commit only if the report is PASS. Automated green is not enough if `Architect Review Notes` still has unchecked items.
 4. **Atomic Commits**: Use `feat|fix|chore|docs|test|refactor(scope): description`. One commit = one logical task.
 5. **Security**: No hardcodes, no secrets in code. Use `.env`, environment variables, and typed settings.
 6. **Context Sync**: After completing each phase, run the context-update workflow to refresh `docs/CONTEXT.md`, `docs/STATE.md`, and `docs/CHANGELOG.md`.
@@ -17,6 +17,8 @@
 ## Stack Conventions
 
 Before writing code, running commands, or reasoning about project layout, read **[docs/STACK.md](docs/STACK.md)**. It is the single source of truth for this project's concrete technologies, directory structure, setup commands, test tooling, and per-module style guides.
+
+For phase gates specifically, `docs/STACK.md#gate-commands` is the authoritative command source. Agent wrappers and helper scripts may automate those commands, but they do not replace that contract.
 
 ## Library Documentation Lookup
 
@@ -36,10 +38,7 @@ Do not rely on model memory alone for third-party APIs.
 Keep lightweight project memory in repository docs so different agent runtimes can recover context reliably across sessions.
 
 Recommended files:
-- `docs/ARCHITECTURE.md`
 - `docs/DECISIONS.md`
-- `docs/TESTING.md`
-- `docs/RUNBOOK.md`
 - `docs/KNOWN_GOTCHAS.md`
 
 Keep them concise and current. Prefer updating these files over relying on conversational memory.
@@ -47,6 +46,8 @@ Keep them concise and current. Prefer updating these files over relying on conve
 ## Filesystem Permission Failures
 
 If any file operation fails with `EACCES`, `EPERM`, `Permission denied`, or a read-only filesystem error, stop immediately and ask the user to fix the host permissions before retrying. Do not use `sudo`, `chmod -R 777`, or destructive workarounds on your own.
+
+Use the detailed handoff wording and recovery steps in [docs/KNOWN_GOTCHAS.md](docs/KNOWN_GOTCHAS.md#docker-owned-files-and-permission-denied-errors).
 
 ## Git Workflow Rules
 
@@ -61,10 +62,27 @@ Different agent runtimes may expose these as slash commands, skills, prompts, or
 
 - `spec-sync`: run immediately after modifying `docs/SPEC.md`
 - `phase-init`: scaffold the next `docs/PHASE_XX.md`
-- `phase-gate`: start the local stack, run migrations and required validation checks before commit, and fail if `Architect Review Notes` still have unchecked items
+- `phase-gate`: start the local stack if needed, run the gate commands defined in `docs/STACK.md`, and fail if `Architect Review Notes` still have unchecked items
 - `context-update`: sync `CONTEXT.md`, `STATE.md`, and `CHANGELOG.md` after a completed phase
 
-If your runtime supports slash commands or native skills, map them to these workflows. If not, execute the corresponding protocol manually from the repository docs.
+If your runtime supports slash commands or native skills, map them to these workflows. If not, execute the corresponding protocol manually from `docs/workflows/`.
 
-Canonical portable playbooks should live in `docs/workflows/`.
-For the FastAPI + Nuxt reference stack, projects may expose this workflow through a helper such as `./scripts/phase-gate.sh N`.
+Canonical portable playbooks live in `docs/workflows/`.
+For the FastAPI + Nuxt reference stack, projects may expose the gate through a helper such as `./scripts/phase-gate.sh N`.
+
+## Spec Change Sync
+
+When `docs/SPEC.md` is modified:
+
+1. Run `spec-sync` immediately.
+2. Review all downstream doc changes before committing.
+3. Do not implement a phase marked `⚠️ NEEDS_REVIEW` until that review is resolved.
+
+## CONTEXT.md Version Rules
+
+- **Format**: `vMAJOR.MINOR`
+- **Patch bump**: additive changes such as new endpoints, models, env vars, or types
+- **Minor bump**: breaking changes such as renamed or removed endpoints, schema changes, or incompatible type changes
+- **No bump**: documentation-only changes with zero contract impact
+- Always update `captured_at` when the version changes
+- `CONTEXT.md` is the single source of truth for AI-visible system state and should never lag more than one phase behind

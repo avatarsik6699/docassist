@@ -11,10 +11,10 @@
 
 ## Gotcha Log
 
-### `[short problem title]`
+### Docker-owned files and permission denied errors
 
-- Symptoms: `[what you usually see]`
-- Root cause: `[why it happens]`
-- Fix: `[the shortest safe resolution]`
-- Prevention: `[what to check next time]`
-- Links: `[relevant docs / issue / PR]`
+- Symptoms: `EACCES`, `EPERM`, `Permission denied`, or `Read-only file system` while editing files or running local commands, often after Docker touched `.nuxt/`, `.output/`, `node_modules/.cache/`, or other bind-mounted artifacts.
+- Root cause: a container wrote files to the host as `root`, so the normal user can no longer modify them.
+- Fix: stop immediately and ask the user to repair ownership on the host. Recommended commands are `sudo chown -R $USER:$USER <path>` to keep the files or `sudo rm -rf <path>` to discard generated artifacts safely.
+- Prevention: avoid ad hoc permission workarounds, and prefer cleaning generated artifacts rather than recursively loosening file permissions.
+- Agent handoff: post the exact failing path and command, ask the user to fix ownership, then wait for the word `continue` before retrying. Never use `sudo`, `chmod -R 777`, or silent retries on your own.

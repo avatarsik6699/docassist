@@ -14,6 +14,7 @@
 | Phase    | Status     | Tag    | Gate | Expert | Notes                  |
 |----------|------------|--------|------|--------|------------------------|
 | PHASE_01 | ✅ done | v0.1.0 | ✅   | ✅      | Gate green after stabilizing phase-gate frontend warm-up and E2E execution |
+| PHASE_02 | ⏳ pending | v0.2.0 | —    | —      | Initialized from `SPEC.md` phase plan; depends on PHASE_01 |
 
 <!-- Add new rows here via /phase-init N -->
 

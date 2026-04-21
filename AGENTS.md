@@ -15,43 +15,32 @@ This repository is the template itself, not an active product.
 
 - Do not treat `docs/` as live requirements. They are template files with placeholders.
 - Only make changes that improve the template for future projects.
-- Keep references consistent across `README.md`, `CLAUDE.md`, `AGENTS.md`, `human-instructions/`, and `.claude/skills/`.
-
-## Documentation Lookup
-
-Before writing or reviewing code that depends on an external library or framework, use an up-to-date documentation source.
-
-Preferred order:
-- a configured docs MCP/integration such as Context7, if available in the current agent runtime
-- for OpenAI products specifically, the official OpenAI developer documentation MCP server, if available
-- official library documentation
-- primary-source docs or API references
-
-Do not rely on stale model memory alone for library APIs.
+- Keep references consistent across `README.md`, `CLAUDE.md`, `AGENTS.md`, `human-instructions/`, `docs/workflows/`, `.claude/skills/`, and `plugins/sdd-workflow/`.
 
 ## Repo Memory Files
 
 Keep lightweight project memory in repository docs so different agent runtimes can recover the same high-signal context across sessions.
 
 Recommended files:
-- `docs/ARCHITECTURE.md` for system shape, boundaries, and responsibilities
 - `docs/DECISIONS.md` for ADR-style technical decisions
-- `docs/TESTING.md` for the real validation strategy and required checks
-- `docs/RUNBOOK.md` for operational commands, deploy notes, and recovery steps
 - `docs/KNOWN_GOTCHAS.md` for recurring pitfalls, edge cases, and local-environment traps
 
 Keep these files concise and current. Prefer updating them over relying on conversational memory.
 
+## Library Documentation Lookup
+
+When maintaining the template or reference implementation, use up-to-date documentation for external libraries instead of relying on stale model memory alone.
+
+For derived projects, the canonical runtime rule lives in `human-instructions/AGENTS.for-new-projects.md`.
+
 ## Skills And Protocols
 
-The workflow protocols in `.claude/skills/` are still useful even outside Claude Code, but they are not universally executable as native slash commands.
+The workflow protocols in `docs/workflows/` are the canonical, model-agnostic playbooks for this template. Agent-specific skill wrappers should point to them instead of duplicating the full procedures.
 
 Portable interpretation:
 - `spec-sync`: protocol for propagating `docs/SPEC.md` changes
 - `phase-init`: protocol for scaffolding a new `docs/PHASE_XX.md`
-- `phase-gate`: protocol for starting the local stack, running migrations plus required validation checks, and failing if `Architect Review Notes` still contain unchecked items
+- `phase-gate`: protocol for running the current stack's gate checks from `docs/STACK.md` and failing if `Architect Review Notes` still contain unchecked items
 - `context-update`: protocol for syncing `docs/CONTEXT.md`, `docs/STATE.md`, and `docs/CHANGELOG.md`
 
-If an agent runtime does not support those skills natively, execute the corresponding markdown procedure manually.
-
-Canonical portable playbooks live in `docs/workflows/`.
+If an agent runtime does not support native slash commands or skills, execute the corresponding markdown procedure manually from `docs/workflows/`.

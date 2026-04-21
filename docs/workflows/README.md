@@ -1,10 +1,12 @@
 # Workflow Playbooks
 
-These files are the model-agnostic versions of the workflow procedures that also exist as Claude Code skills under `.claude/skills/`.
+These files are the canonical, model-agnostic workflow procedures for the SDD pipeline.
 
-Use them when:
+Agent-specific wrappers should point here rather than duplicate the full instructions.
 
-- the agent runtime does not support Claude slash skills
+Use these playbooks when:
+
+- the agent runtime does not support native slash skills
 - you want one canonical workflow that multiple agents can follow
 - you want to review or refine the process without editing agent-specific wrappers first
 
