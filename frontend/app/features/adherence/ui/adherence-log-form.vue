@@ -10,7 +10,9 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  submit: [payload: { medicationId: string; status: AdherenceStatus; deviationNote: string | null }];
+  submit: [
+    payload: { medicationId: string; status: AdherenceStatus; deviationNote: string | null },
+  ];
 }>();
 
 const medicationId = ref('');
@@ -62,7 +64,9 @@ function handleSubmit() {
       class="grid gap-3 rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm"
       @submit.prevent="handleSubmit"
     >
-      <label for="adherence-medication" class="text-sm font-medium text-slate-700">Medication</label>
+      <label for="adherence-medication" class="text-sm font-medium text-slate-700"
+        >Medication</label
+      >
       <select
         id="adherence-medication"
         v-model="medicationId"

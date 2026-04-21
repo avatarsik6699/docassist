@@ -1,7 +1,10 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('phase 03 medication adherence', () => {
-  test('doctor assigns medication and sees patient adherence history', async ({ page, request }) => {
+  test('doctor assigns medication and sees patient adherence history', async ({
+    page,
+    request,
+  }) => {
     const patientEmail = `meds-${Date.now()}@example.com`;
 
     const doctorLoginResponse = await request.post('http://localhost:8000/api/v1/auth/login', {

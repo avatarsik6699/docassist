@@ -28,7 +28,9 @@ export const useMedicationStore = defineStore('medications', () => {
     error.value = null;
     try {
       const { $api } = useNuxtApp();
-      const data = await $api<{ items: MedicationItem[] }>(`/api/v1/patients/${patientId}/medications`);
+      const data = await $api<{ items: MedicationItem[] }>(
+        `/api/v1/patients/${patientId}/medications`
+      );
       doctorItems.value = data.items;
       return data.items;
     } catch (err: unknown) {

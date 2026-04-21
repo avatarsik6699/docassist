@@ -34,10 +34,12 @@ function handleSubmit() {
   <section class="space-y-4">
     <div class="space-y-2">
       <p class="eyebrow">Medication plan</p>
-      <h2 class="text-2xl font-semibold tracking-tight text-slate-950">Assign current medication</h2>
+      <h2 class="text-2xl font-semibold tracking-tight text-slate-950">
+        Assign current medication
+      </h2>
       <p class="max-w-2xl text-sm leading-6 text-slate-600">
-        Record the current medication list for the selected patient and keep dosage instructions visible
-        for future follow-up.
+        Record the current medication list for the selected patient and keep dosage instructions
+        visible for future follow-up.
       </p>
     </div>
 
@@ -45,12 +47,17 @@ function handleSubmit() {
       class="grid gap-3 rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm"
       @submit.prevent="handleSubmit"
     >
-      <div class="rounded-2xl bg-slate-50 p-3 text-sm text-slate-600" data-testid="selected-patient-banner">
+      <div
+        class="rounded-2xl bg-slate-50 p-3 text-sm text-slate-600"
+        data-testid="selected-patient-banner"
+      >
         <span v-if="props.patientEmail">Managing medications for {{ props.patientEmail }}</span>
         <span v-else>Select a patient above to start medication tracking.</span>
       </div>
 
-      <label for="medication-name" class="text-sm font-medium text-slate-700">Medication name</label>
+      <label for="medication-name" class="text-sm font-medium text-slate-700"
+        >Medication name</label
+      >
       <input
         id="medication-name"
         v-model="name"
@@ -75,7 +82,11 @@ function handleSubmit() {
         required
       />
 
-      <p v-if="props.error" class="text-sm text-rose-600" data-testid="doctor-medication-form-error">
+      <p
+        v-if="props.error"
+        class="text-sm text-rose-600"
+        data-testid="doctor-medication-form-error"
+      >
         {{ props.error }}
       </p>
 
