@@ -150,6 +150,30 @@ async def patient_user(db_session: AsyncSession, doctor_user: User) -> User:
 
 
 @pytest.fixture()
+async def other_patient_user(db_session: AsyncSession, other_doctor_user: User) -> User:
+    user = User(
+        email=f"patient_other_{uuid4().hex[:8]}@example.com",
+        hashed_password=hash_password("temporary123"),
+        role=UserRole.patient,
+        is_active=True,
+    )
+    db_session.add(user)
+    await db_session.flush()
+    db_session.add(
+        PatientProfile(
+            user_id=user.id,
+            doctor_user_id=other_doctor_user.id,
+            onboarding_status=OnboardingStatus.pending.value,
+            must_change_password=True,
+            is_active_with_doctor=True,
+        )
+    )
+    await db_session.commit()
+    await db_session.refresh(user)
+    return user
+
+
+@pytest.fixture()
 def patient_headers(patient_user: User) -> dict[str, str]:
     token = create_access_token({"sub": str(patient_user.id), "role": patient_user.role.value})
     return {"Authorization": f"Bearer {token}"}

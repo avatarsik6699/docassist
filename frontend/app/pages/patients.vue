@@ -4,6 +4,8 @@ import type { PatientRosterItem } from '@features/patient-roster/model/patient-r
 import { useMedicationStore } from '@features/medications/model/medication-store';
 import DoctorMedicationForm from '@features/medications/ui/doctor-medication-form.vue';
 import PatientMedicationList from '@features/medications/ui/patient-medication-list.vue';
+import { usePatientSummaryStore } from '@features/patient-summary/model/patient-summary-store';
+import PatientSummaryPanel from '@features/patient-summary/ui/patient-summary-panel.vue';
 import PatientOnboardingForm from '@features/patient-roster/ui/patient-onboarding-form.vue';
 import PatientRosterTable from '@features/patient-roster/ui/patient-roster-table.vue';
 import { usePatientRosterStore } from '@features/patient-roster/model/patient-roster-store';
@@ -12,6 +14,7 @@ import {
   type QuestionnaireCode,
 } from '@features/questionnaires/model/questionnaire-store';
 import DoctorQuestionnaireAssignmentForm from '@features/questionnaires/ui/doctor-questionnaire-assignment-form.vue';
+import { useSideEffectsStore } from '@features/side-effects/model/side-effects-store';
 
 definePageMeta({ layout: 'default' });
 
@@ -20,6 +23,8 @@ const rosterStore = usePatientRosterStore();
 const medicationStore = useMedicationStore();
 const adherenceStore = useAdherenceStore();
 const questionnaireStore = useQuestionnaireStore();
+const patientSummaryStore = usePatientSummaryStore();
+const sideEffectsStore = useSideEffectsStore();
 
 const isDoctor = computed(() => authStore.user?.role === 'doctor');
 const pageError = ref<string | null>(null);
@@ -47,6 +52,8 @@ async function loadSelectedPatientData() {
   if (!selectedPatientId.value) {
     medicationStore.doctorItems = [];
     adherenceStore.history = [];
+    sideEffectsStore.history = [];
+    patientSummaryStore.clearSummary();
     return;
   }
 
@@ -55,6 +62,8 @@ async function loadSelectedPatientData() {
       medicationStore.loadDoctorMedications(selectedPatientId.value),
       adherenceStore.loadHistory(selectedPatientId.value),
       questionnaireStore.loadDoctorAssignments(selectedPatientId.value),
+      sideEffectsStore.loadHistory(selectedPatientId.value),
+      patientSummaryStore.loadSummary(selectedPatientId.value),
     ]);
   } catch (err: unknown) {
     pageError.value = err instanceof Error ? err.message : 'Unable to load patient details.';
@@ -138,11 +147,11 @@ onMounted(async () => {
 <template>
   <div class="space-y-8">
     <div class="space-y-2">
-      <p class="eyebrow">Phase 03</p>
+      <p class="eyebrow">Phase 05</p>
       <h1 class="text-3xl font-semibold tracking-tight text-slate-950">Patient roster</h1>
       <p class="max-w-2xl text-sm leading-6 text-slate-600">
-        Create new patient accounts, manage active medications for assigned patients, and review
-        their recent adherence history in one place.
+        Create patient accounts, manage assigned treatment tasks, and review recent history with
+        safety highlighting in one place.
       </p>
     </div>
 
@@ -187,6 +196,12 @@ onMounted(async () => {
         </option>
       </select>
     </section>
+
+    <PatientSummaryPanel
+      :summary="patientSummaryStore.summary"
+      :side-effects-history="sideEffectsStore.history"
+      :is-loading="patientSummaryStore.isLoading || sideEffectsStore.isLoadingHistory"
+    />
 
     <DoctorMedicationForm
       :patient-email="selectedPatient?.email ?? null"
@@ -328,6 +343,64 @@ onMounted(async () => {
               <td class="px-4 py-4 text-sm text-slate-600">
                 {{ item.deviation_note || 'No deviation note' }}
               </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="space-y-4">
+      <div class="space-y-2">
+        <p class="eyebrow">Side effects</p>
+        <h2 class="text-2xl font-semibold tracking-tight text-slate-950">Reported symptoms</h2>
+      </div>
+
+      <div
+        class="overflow-hidden rounded-3xl border border-slate-200 bg-white/90 shadow-sm"
+        data-testid="doctor-side-effects-history"
+      >
+        <div v-if="sideEffectsStore.isLoadingHistory" class="p-6 text-sm text-slate-500">
+          Loading side effects…
+        </div>
+        <div
+          v-else-if="sideEffectsStore.history.length === 0"
+          class="p-6 text-sm text-slate-500"
+          data-testid="doctor-side-effects-empty"
+        >
+          No side-effect reports submitted yet.
+        </div>
+        <table v-else class="min-w-full divide-y divide-slate-200">
+          <thead class="bg-slate-50">
+            <tr>
+              <th
+                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500"
+              >
+                Severity
+              </th>
+              <th
+                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500"
+              >
+                Symptom
+              </th>
+              <th
+                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500"
+              >
+                Note
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200">
+            <tr v-for="item in sideEffectsStore.history" :key="item.id">
+              <td
+                class="px-4 py-4 text-sm capitalize"
+                :class="
+                  item.severity === 'severe' ? 'font-semibold text-rose-600' : 'text-slate-600'
+                "
+              >
+                {{ item.severity }}
+              </td>
+              <td class="px-4 py-4 text-sm text-slate-900">{{ item.symptom }}</td>
+              <td class="px-4 py-4 text-sm text-slate-600">{{ item.note ?? '—' }}</td>
             </tr>
           </tbody>
         </table>

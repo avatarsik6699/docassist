@@ -245,6 +245,57 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/side-effects': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Create Side Effect Report */
+    post: operations['create_side_effect_report_api_v1_side_effects_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/patients/{patient_id}/side-effects': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Patient Side Effects */
+    get: operations['list_patient_side_effects_api_v1_patients__patient_id__side_effects_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/patients/{patient_id}/summary': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Patient Summary */
+    get: operations['get_patient_summary_api_v1_patients__patient_id__summary_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -353,6 +404,22 @@ export interface components {
        */
       questionnaire_code: 'PHQ-9' | 'GAD-7';
     };
+    /** CreateSideEffectReportRequest */
+    CreateSideEffectReportRequest: {
+      /**
+       * Severity
+       * @enum {string}
+       */
+      severity: 'mild' | 'moderate' | 'severe';
+      /** Symptom */
+      symptom: string;
+      /** Note */
+      note?: string | null;
+      /** Medication Id */
+      medication_id?: string | null;
+      /** Reported At */
+      reported_at?: string | null;
+    };
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
@@ -416,6 +483,51 @@ export interface components {
        */
       doctor_user_id: string;
     };
+    /** PatientAdherenceSummaryItem */
+    PatientAdherenceSummaryItem: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Medication Id
+       * Format: uuid
+       */
+      medication_id: string;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: 'taken' | 'missed' | 'modified';
+      /**
+       * Logged At
+       * Format: date-time
+       */
+      logged_at: string;
+    };
+    /** PatientQuestionnaireSummaryItem */
+    PatientQuestionnaireSummaryItem: {
+      /**
+       * Assignment Id
+       * Format: uuid
+       */
+      assignment_id: string;
+      /**
+       * Questionnaire Code
+       * @enum {string}
+       */
+      questionnaire_code: 'PHQ-9' | 'GAD-7';
+      /** Total Score */
+      total_score: number;
+      /** Has Safety Signal */
+      has_safety_signal: boolean;
+      /**
+       * Submitted At
+       * Format: date-time
+       */
+      submitted_at: string;
+    };
     /** PatientRosterItem */
     PatientRosterItem: {
       /**
@@ -437,6 +549,57 @@ export interface components {
     PatientRosterResponse: {
       /** Items */
       items: components['schemas']['PatientRosterItem'][];
+    };
+    /** PatientSafetyFlag */
+    PatientSafetyFlag: {
+      /**
+       * Source
+       * @enum {string}
+       */
+      source: 'questionnaire' | 'side_effect';
+      /**
+       * Level
+       * @enum {string}
+       */
+      level: 'critical' | 'warning';
+      /** Code */
+      code: string;
+    };
+    /** PatientSideEffectSummaryItem */
+    PatientSideEffectSummaryItem: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Severity
+       * @enum {string}
+       */
+      severity: 'mild' | 'moderate' | 'severe';
+      /** Symptom */
+      symptom: string;
+      /**
+       * Reported At
+       * Format: date-time
+       */
+      reported_at: string;
+    };
+    /** PatientSummaryResponse */
+    PatientSummaryResponse: {
+      /**
+       * Patient Id
+       * Format: uuid
+       */
+      patient_id: string;
+      /** Questionnaires */
+      questionnaires: components['schemas']['PatientQuestionnaireSummaryItem'][];
+      /** Adherence */
+      adherence: components['schemas']['PatientAdherenceSummaryItem'][];
+      /** Side Effects */
+      side_effects: components['schemas']['PatientSideEffectSummaryItem'][];
+      /** Safety Flags */
+      safety_flags: components['schemas']['PatientSafetyFlag'][];
     };
     /** PendingQuestionnaireItem */
     PendingQuestionnaireItem: {
@@ -564,6 +727,67 @@ export interface components {
     SetupAccountRequest: {
       /** New Password */
       new_password: string;
+    };
+    /** SideEffectReportItem */
+    SideEffectReportItem: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Severity
+       * @enum {string}
+       */
+      severity: 'mild' | 'moderate' | 'severe';
+      /** Symptom */
+      symptom: string;
+      /** Note */
+      note: string | null;
+      /**
+       * Reported At
+       * Format: date-time
+       */
+      reported_at: string;
+    };
+    /** SideEffectReportListResponse */
+    SideEffectReportListResponse: {
+      /** Items */
+      items: components['schemas']['SideEffectReportItem'][];
+    };
+    /** SideEffectReportOut */
+    SideEffectReportOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Patient User Id
+       * Format: uuid
+       */
+      patient_user_id: string;
+      /**
+       * Doctor User Id
+       * Format: uuid
+       */
+      doctor_user_id: string;
+      /** Medication Id */
+      medication_id: string | null;
+      /**
+       * Severity
+       * @enum {string}
+       */
+      severity: 'mild' | 'moderate' | 'severe';
+      /** Symptom */
+      symptom: string;
+      /** Note */
+      note: string | null;
+      /**
+       * Reported At
+       * Format: date-time
+       */
+      reported_at: string;
     };
     /** SubmitQuestionnaireRequest */
     SubmitQuestionnaireRequest: {
@@ -1096,6 +1320,101 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['QuestionnaireSubmissionResult'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  create_side_effect_report_api_v1_side_effects_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateSideEffectReportRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SideEffectReportOut'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  list_patient_side_effects_api_v1_patients__patient_id__side_effects_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        patient_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SideEffectReportListResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  get_patient_summary_api_v1_patients__patient_id__summary_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        patient_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PatientSummaryResponse'];
         };
       };
       /** @description Validation Error */

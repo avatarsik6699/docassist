@@ -6,6 +6,8 @@ import { useMedicationStore } from '@features/medications/model/medication-store
 import PatientMedicationList from '@features/medications/ui/patient-medication-list.vue';
 import { useQuestionnaireStore } from '@features/questionnaires/model/questionnaire-store';
 import PatientQuestionnaireList from '@features/questionnaires/ui/patient-questionnaire-list.vue';
+import { useSideEffectsStore } from '@features/side-effects/model/side-effects-store';
+import SideEffectReportForm from '@features/side-effects/ui/side-effect-report-form.vue';
 
 definePageMeta({ layout: 'default' });
 
@@ -13,6 +15,7 @@ const authStore = useAuthStore();
 const medicationStore = useMedicationStore();
 const adherenceStore = useAdherenceStore();
 const questionnaireStore = useQuestionnaireStore();
+const sideEffectsStore = useSideEffectsStore();
 const isDoctor = computed(() => authStore.user?.role === 'doctor');
 const isPatient = computed(() => authStore.user?.role === 'patient');
 const pageError = ref<string | null>(null);
@@ -42,6 +45,20 @@ async function handleSubmitAdherence(payload: {
     await adherenceStore.submitLog(payload);
   } catch (err: unknown) {
     pageError.value = err instanceof Error ? err.message : 'Unable to save adherence.';
+  }
+}
+
+async function handleSubmitSideEffect(payload: {
+  medicationId: string | null;
+  severity: 'mild' | 'moderate' | 'severe';
+  symptom: string;
+  note: string | null;
+}) {
+  pageError.value = null;
+  try {
+    await sideEffectsStore.submitReport(payload);
+  } catch (err: unknown) {
+    pageError.value = err instanceof Error ? err.message : 'Unable to report side effect.';
   }
 }
 
@@ -188,6 +205,14 @@ onMounted(async () => {
         :error="adherenceStore.error"
         :success-message="adherenceStore.successMessage"
         @submit="handleSubmitAdherence"
+      />
+
+      <SideEffectReportForm
+        :medications="medicationStore.patientItems"
+        :is-submitting="sideEffectsStore.isSubmitting"
+        :error="sideEffectsStore.error"
+        :success-message="sideEffectsStore.successMessage"
+        @submit="handleSubmitSideEffect"
       />
     </template>
   </div>

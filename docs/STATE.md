@@ -17,6 +17,7 @@
 | PHASE_02 | ✅ done | v0.2.0 | ✅   | ✅      | Gate green after fixing phase-specific smoke override and frontend SSR auth/session redirects |
 | PHASE_03 | ✅ done | v0.3.0 | ✅   | ✅      | Contract synced after landing medication assignment, patient adherence logging, and doctor adherence review |
 | PHASE_04 | ✅ done | v0.4.0 | ✅ | ✅ | Contract synced after landing questionnaire assignment, submission, and scoring for PHQ-9/GAD-7 |
+| PHASE_05 | ⏳ pending | v0.5.0 | — | — | Doctor patient view with recent history and safety highlighting |
 
 <!-- Add new rows here via /phase-init N -->
 

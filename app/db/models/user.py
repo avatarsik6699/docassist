@@ -46,3 +46,11 @@ class User(UUIDMixin, TimestampMixin, Base):
         "QuestionnaireResponse",
         foreign_keys="QuestionnaireResponse.patient_user_id",
     )
+    side_effect_reports = relationship(
+        "SideEffectReport",
+        foreign_keys="SideEffectReport.patient_user_id",
+    )
+    managed_side_effect_reports = relationship(
+        "SideEffectReport",
+        foreign_keys="SideEffectReport.doctor_user_id",
+    )

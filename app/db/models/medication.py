@@ -31,3 +31,4 @@ class Medication(UUIDMixin, TimestampMixin, Base):
         cascade="all, delete-orphan",
         order_by="desc(AdherenceLog.logged_at)",
     )
+    side_effect_reports = relationship("SideEffectReport", back_populates="medication")

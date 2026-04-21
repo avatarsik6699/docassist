@@ -8,6 +8,7 @@ from app.db.models.questionnaire_assignment import (
     QuestionnaireCode,
 )
 from app.db.models.questionnaire_response import QuestionnaireResponse
+from app.db.models.side_effect_report import SideEffectReport
 from app.db.models.user import User, UserRole
 
 __all__ = [
@@ -20,6 +21,7 @@ __all__ = [
     "QuestionnaireAssignmentStatus",
     "QuestionnaireCode",
     "QuestionnaireResponse",
+    "SideEffectReport",
     "User",
     "UserRole",
 ]
