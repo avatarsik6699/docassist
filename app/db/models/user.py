@@ -34,3 +34,15 @@ class User(UUIDMixin, TimestampMixin, Base):
     medications = relationship("Medication", foreign_keys="Medication.patient_user_id")
     managed_medications = relationship("Medication", foreign_keys="Medication.doctor_user_id")
     adherence_logs = relationship("AdherenceLog", foreign_keys="AdherenceLog.patient_user_id")
+    questionnaire_assignments = relationship(
+        "QuestionnaireAssignment",
+        foreign_keys="QuestionnaireAssignment.patient_user_id",
+    )
+    managed_questionnaire_assignments = relationship(
+        "QuestionnaireAssignment",
+        foreign_keys="QuestionnaireAssignment.doctor_user_id",
+    )
+    questionnaire_responses = relationship(
+        "QuestionnaireResponse",
+        foreign_keys="QuestionnaireResponse.patient_user_id",
+    )

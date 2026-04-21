@@ -6,6 +6,28 @@
 
 ---
 
+## v1.5 — 2026-04-21 — Phase 04 Contract Synced
+
+**Type**: phase-completion
+**Author**: Codex (`/context-update`)
+**Triggered by**: Phase 04 implementation landed and the questionnaire assignment, submission, and scoring contract became active
+
+### Changes
+- Added questionnaire assignment and response contracts for supported `PHQ-9` and `GAD-7` workflows
+- Recorded doctor and patient questionnaire API endpoints for assignment listing/creation, pending retrieval, and submission
+- Captured the patient questionnaire completion route and advanced the schema snapshot to Alembic head `0004_questionnaire_assignments_and_responses`
+
+### Affected Phases
+- PHASE_04 — implementation synchronized into the shared contract snapshot after the phase deliverables landed
+
+### Contract Updates
+- `CONTEXT.md` bumped from `v1.4` to `v1.5`
+- Added `QuestionnaireAssignment` and `QuestionnaireResponse` to the active core model snapshot
+- Appended questionnaire endpoints and expanded the schema table snapshot to include `questionnaire_assignments` and `questionnaire_responses`
+
+### Notes
+This is an additive bump because Phase 04 extends the active contract surface without replacing existing Phase 01-03 behavior.
+
 ## v1.4 — 2026-04-21 — Phase 03 Contract Synced
 
 **Type**: phase-completion

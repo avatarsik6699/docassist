@@ -4,12 +4,15 @@ import AdherenceLogForm from '@features/adherence/ui/adherence-log-form.vue';
 import { useAuthStore } from '@features/auth/model/auth-store';
 import { useMedicationStore } from '@features/medications/model/medication-store';
 import PatientMedicationList from '@features/medications/ui/patient-medication-list.vue';
+import { useQuestionnaireStore } from '@features/questionnaires/model/questionnaire-store';
+import PatientQuestionnaireList from '@features/questionnaires/ui/patient-questionnaire-list.vue';
 
 definePageMeta({ layout: 'default' });
 
 const authStore = useAuthStore();
 const medicationStore = useMedicationStore();
 const adherenceStore = useAdherenceStore();
+const questionnaireStore = useQuestionnaireStore();
 const isDoctor = computed(() => authStore.user?.role === 'doctor');
 const isPatient = computed(() => authStore.user?.role === 'patient');
 const pageError = ref<string | null>(null);
@@ -20,9 +23,12 @@ async function loadPatientData() {
   }
 
   try {
-    await medicationStore.loadCurrentMedications();
+    await Promise.all([
+      medicationStore.loadCurrentMedications(),
+      questionnaireStore.loadPendingQuestionnaires(),
+    ]);
   } catch (err: unknown) {
-    pageError.value = err instanceof Error ? err.message : 'Unable to load medications.';
+    pageError.value = err instanceof Error ? err.message : 'Unable to load patient dashboard data.';
   }
 }
 
@@ -165,6 +171,11 @@ onMounted(async () => {
     </UCard>
 
     <template v-if="isPatient && !authStore.requiresAccountSetup">
+      <PatientQuestionnaireList
+        :items="questionnaireStore.pendingItems"
+        :is-loading="questionnaireStore.isLoadingPendingItems"
+      />
+
       <PatientMedicationList
         :items="medicationStore.patientItems"
         :is-loading="medicationStore.isLoadingPatientItems"

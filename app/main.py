@@ -10,6 +10,7 @@ from app.api.v1.auth import router as auth_router
 from app.api.v1.health import router as health_router
 from app.api.v1.medications import router as medications_router
 from app.api.v1.patients import router as patients_router
+from app.api.v1.questionnaires import router as questionnaires_router
 from app.core.config import settings
 from app.db.session import close_db, init_db
 
@@ -30,7 +31,7 @@ async def lifespan(app: FastAPI):  # type: ignore[type-arg]
 
 app = FastAPI(
     title="Docassist",
-    version="0.3.0",
+    version="0.4.0",
     description="",
     lifespan=lifespan,
 )
@@ -57,3 +58,4 @@ app.include_router(health_router, prefix=ROUTER_V1_PREFIX)
 app.include_router(auth_router, prefix=ROUTER_V1_PREFIX)
 app.include_router(patients_router, prefix=ROUTER_V1_PREFIX)
 app.include_router(medications_router, prefix=ROUTER_V1_PREFIX)
+app.include_router(questionnaires_router, prefix=ROUTER_V1_PREFIX)

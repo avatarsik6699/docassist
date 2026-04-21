@@ -193,6 +193,58 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/patients/{patient_id}/questionnaires': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Patient Questionnaires */
+    get: operations['list_patient_questionnaires_api_v1_patients__patient_id__questionnaires_get'];
+    put?: never;
+    /** Create Patient Questionnaire Assignment */
+    post: operations['create_patient_questionnaire_assignment_api_v1_patients__patient_id__questionnaires_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/questionnaires/pending': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Pending Questionnaires */
+    get: operations['list_pending_questionnaires_api_v1_questionnaires_pending_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/questionnaires/{assignment_id}/submit': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Submit Questionnaire */
+    post: operations['submit_questionnaire_api_v1_questionnaires__assignment_id__submit_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -293,6 +345,14 @@ export interface components {
       /** Temporary Password */
       temporary_password: string;
     };
+    /** CreateQuestionnaireAssignmentRequest */
+    CreateQuestionnaireAssignmentRequest: {
+      /**
+       * Questionnaire Code
+       * @enum {string}
+       */
+      questionnaire_code: 'PHQ-9' | 'GAD-7';
+    };
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
@@ -378,10 +438,139 @@ export interface components {
       /** Items */
       items: components['schemas']['PatientRosterItem'][];
     };
+    /** PendingQuestionnaireItem */
+    PendingQuestionnaireItem: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Questionnaire Code
+       * @enum {string}
+       */
+      questionnaire_code: 'PHQ-9' | 'GAD-7';
+      /**
+       * Status
+       * @constant
+       */
+      status: 'assigned';
+      /**
+       * Assigned At
+       * Format: date-time
+       */
+      assigned_at: string;
+    };
+    /** PendingQuestionnaireListResponse */
+    PendingQuestionnaireListResponse: {
+      /** Items */
+      items: components['schemas']['PendingQuestionnaireItem'][];
+    };
+    /** QuestionnaireAssignmentItem */
+    QuestionnaireAssignmentItem: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Questionnaire Code
+       * @enum {string}
+       */
+      questionnaire_code: 'PHQ-9' | 'GAD-7';
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: 'assigned' | 'completed';
+      /**
+       * Assigned At
+       * Format: date-time
+       */
+      assigned_at: string;
+      /** Completed At */
+      completed_at: string | null;
+      /** Total Score */
+      total_score?: number | null;
+      /** Has Safety Signal */
+      has_safety_signal?: boolean | null;
+    };
+    /** QuestionnaireAssignmentListResponse */
+    QuestionnaireAssignmentListResponse: {
+      /** Items */
+      items: components['schemas']['QuestionnaireAssignmentItem'][];
+    };
+    /** QuestionnaireAssignmentOut */
+    QuestionnaireAssignmentOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Patient User Id
+       * Format: uuid
+       */
+      patient_user_id: string;
+      /**
+       * Doctor User Id
+       * Format: uuid
+       */
+      doctor_user_id: string;
+      /**
+       * Questionnaire Code
+       * @enum {string}
+       */
+      questionnaire_code: 'PHQ-9' | 'GAD-7';
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: 'assigned' | 'completed';
+      /**
+       * Assigned At
+       * Format: date-time
+       */
+      assigned_at: string;
+    };
+    /** QuestionnaireSubmissionResult */
+    QuestionnaireSubmissionResult: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Assignment Id
+       * Format: uuid
+       */
+      assignment_id: string;
+      /**
+       * Questionnaire Code
+       * @enum {string}
+       */
+      questionnaire_code: 'PHQ-9' | 'GAD-7';
+      /** Total Score */
+      total_score: number;
+      /** Has Safety Signal */
+      has_safety_signal: boolean;
+      /**
+       * Submitted At
+       * Format: date-time
+       */
+      submitted_at: string;
+    };
     /** SetupAccountRequest */
     SetupAccountRequest: {
       /** New Password */
       new_password: string;
+    };
+    /** SubmitQuestionnaireRequest */
+    SubmitQuestionnaireRequest: {
+      /** Answers */
+      answers: {
+        [key: string]: number;
+      };
     };
     /** TokenResponse */
     TokenResponse: {
@@ -786,6 +975,127 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['AdherenceLogListResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  list_patient_questionnaires_api_v1_patients__patient_id__questionnaires_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        patient_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['QuestionnaireAssignmentListResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  create_patient_questionnaire_assignment_api_v1_patients__patient_id__questionnaires_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        patient_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateQuestionnaireAssignmentRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['QuestionnaireAssignmentOut'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  list_pending_questionnaires_api_v1_questionnaires_pending_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PendingQuestionnaireListResponse'];
+        };
+      };
+    };
+  };
+  submit_questionnaire_api_v1_questionnaires__assignment_id__submit_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        assignment_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SubmitQuestionnaireRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['QuestionnaireSubmissionResult'];
         };
       };
       /** @description Validation Error */

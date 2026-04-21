@@ -7,6 +7,11 @@ import PatientMedicationList from '@features/medications/ui/patient-medication-l
 import PatientOnboardingForm from '@features/patient-roster/ui/patient-onboarding-form.vue';
 import PatientRosterTable from '@features/patient-roster/ui/patient-roster-table.vue';
 import { usePatientRosterStore } from '@features/patient-roster/model/patient-roster-store';
+import {
+  useQuestionnaireStore,
+  type QuestionnaireCode,
+} from '@features/questionnaires/model/questionnaire-store';
+import DoctorQuestionnaireAssignmentForm from '@features/questionnaires/ui/doctor-questionnaire-assignment-form.vue';
 
 definePageMeta({ layout: 'default' });
 
@@ -14,6 +19,7 @@ const authStore = useAuthStore();
 const rosterStore = usePatientRosterStore();
 const medicationStore = useMedicationStore();
 const adherenceStore = useAdherenceStore();
+const questionnaireStore = useQuestionnaireStore();
 
 const isDoctor = computed(() => authStore.user?.role === 'doctor');
 const pageError = ref<string | null>(null);
@@ -48,6 +54,7 @@ async function loadSelectedPatientData() {
     await Promise.all([
       medicationStore.loadDoctorMedications(selectedPatientId.value),
       adherenceStore.loadHistory(selectedPatientId.value),
+      questionnaireStore.loadDoctorAssignments(selectedPatientId.value),
     ]);
   } catch (err: unknown) {
     pageError.value = err instanceof Error ? err.message : 'Unable to load patient details.';
@@ -86,6 +93,22 @@ async function handleCreateMedication(payload: { name: string; dosage_instructio
     await medicationStore.createMedication(selectedPatientId.value, payload);
   } catch (err: unknown) {
     pageError.value = err instanceof Error ? err.message : 'Unable to save medication.';
+  }
+}
+
+async function handleAssignQuestionnaire(payload: { questionnaireCode: QuestionnaireCode }) {
+  if (!selectedPatientId.value) {
+    return;
+  }
+
+  pageError.value = null;
+  try {
+    await questionnaireStore.assignQuestionnaire(
+      selectedPatientId.value,
+      payload.questionnaireCode
+    );
+  } catch (err: unknown) {
+    pageError.value = err instanceof Error ? err.message : 'Unable to assign questionnaire.';
   }
 }
 
@@ -172,11 +195,79 @@ onMounted(async () => {
       @submit="handleCreateMedication"
     />
 
+    <DoctorQuestionnaireAssignmentForm
+      :patient-email="selectedPatient?.email ?? null"
+      :is-submitting="questionnaireStore.isAssigning"
+      :error="questionnaireStore.error"
+      @submit="handleAssignQuestionnaire"
+    />
+
     <PatientMedicationList
       :items="medicationStore.doctorItems"
       :is-loading="medicationStore.isLoadingDoctorItems"
       empty-message="No active medications are recorded for this patient yet."
     />
+
+    <section class="space-y-4">
+      <div class="space-y-2">
+        <p class="eyebrow">Questionnaire history</p>
+        <h2 class="text-2xl font-semibold tracking-tight text-slate-950">Assignments</h2>
+      </div>
+
+      <div
+        class="overflow-hidden rounded-3xl border border-slate-200 bg-white/90 shadow-sm"
+        data-testid="doctor-questionnaire-history"
+      >
+        <div v-if="questionnaireStore.isLoadingDoctorItems" class="p-6 text-sm text-slate-500">
+          Loading questionnaires…
+        </div>
+        <div
+          v-else-if="questionnaireStore.doctorItems.length === 0"
+          class="p-6 text-sm text-slate-500"
+          data-testid="doctor-questionnaire-empty"
+        >
+          No questionnaires assigned yet.
+        </div>
+        <table v-else class="min-w-full divide-y divide-slate-200">
+          <thead class="bg-slate-50">
+            <tr>
+              <th
+                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500"
+              >
+                Questionnaire
+              </th>
+              <th
+                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500"
+              >
+                Status
+              </th>
+              <th
+                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500"
+              >
+                Score
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200">
+            <tr v-for="item in questionnaireStore.doctorItems" :key="item.id">
+              <td class="px-4 py-4 text-sm font-medium text-slate-900">
+                {{ item.questionnaire_code }}
+              </td>
+              <td class="px-4 py-4 text-sm capitalize text-slate-600">{{ item.status }}</td>
+              <td class="px-4 py-4 text-sm text-slate-600">
+                <span v-if="item.total_score !== null && item.total_score !== undefined">
+                  {{ item.total_score }}
+                  <span v-if="item.has_safety_signal" class="ml-2 font-medium text-rose-600">
+                    safety flag
+                  </span>
+                </span>
+                <span v-else>Pending</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
 
     <section class="space-y-4">
       <div class="space-y-2">
@@ -205,19 +296,29 @@ onMounted(async () => {
         <table v-else class="min-w-full divide-y divide-slate-200">
           <thead class="bg-slate-50">
             <tr>
-              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+              <th
+                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500"
+              >
                 Time
               </th>
-              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+              <th
+                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500"
+              >
                 Status
               </th>
-              <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+              <th
+                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500"
+              >
                 Note
               </th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-200">
-            <tr v-for="item in adherenceStore.history" :key="item.id" :data-testid="`adherence-row-${item.id}`">
+            <tr
+              v-for="item in adherenceStore.history"
+              :key="item.id"
+              :data-testid="`adherence-row-${item.id}`"
+            >
               <td class="px-4 py-4 text-sm text-slate-600">
                 {{ new Date(item.logged_at).toLocaleString() }}
               </td>
