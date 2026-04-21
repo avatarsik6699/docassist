@@ -67,7 +67,6 @@ fi
 
 SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_hex(32))")
 DB_PASSWORD=$(python3 -c "import secrets; print(secrets.token_urlsafe(24))")
-REDIS_PASSWORD=$(python3 -c "import secrets; print(secrets.token_urlsafe(24))")
 
 # ── banner ────────────────────────────────────────────────────────────────────
 
@@ -81,18 +80,18 @@ echo ""
 
 cp .env.example .env
 
-# Replace secrets (order matters: more specific pattern first)
-sedi "s|changeme_redis|$REDIS_PASSWORD|g" .env
-sedi "s|changeme|$DB_PASSWORD|g" .env
-sedi "s|CHANGE_ME_generate_a_secure_random_hex_string|$SECRET_KEY|g" .env
+# Replace generated values
+sedi "s|^POSTGRES_PASSWORD=.*|POSTGRES_PASSWORD=$DB_PASSWORD|" .env
+sedi "s|^DATABASE_URL=.*|DATABASE_URL=postgresql+asyncpg://app_user:$DB_PASSWORD@db:5432/docassist|" .env
+sedi "s|^SECRET_KEY=.*|SECRET_KEY=$SECRET_KEY|" .env
 
 # Replace domain placeholder
 sedi "s|\[DOMAIN\]|$DOMAIN|g" .env
 
 # Production-specific values
 sedi "s|^APP_ENV=.*|APP_ENV=production|" .env
-sedi "s|^NUXT_PUBLIC_API_BASE=.*|NUXT_PUBLIC_API_BASE=https://$DOMAIN|" .env
-# Note: no /api suffix — adding it causes double-prefix (/api/api/...) in browser requests
+sedi "s|^API_BASE_URL=.*|API_BASE_URL=https://$DOMAIN/api/v1|" .env
+sedi "s|^API_BASE_INTERNAL_URL=.*|API_BASE_INTERNAL_URL=http://backend:8000/api/v1|" .env
 sedi 's|^CORS_ORIGINS=.*|CORS_ORIGINS=["https://'"$DOMAIN"'","https://www.'"$DOMAIN"'"]|' .env
 
 echo "  ✓ .env created"
@@ -118,7 +117,6 @@ echo "Done. Production .env is ready."
 echo ""
 echo "Generated secrets (shown once — already saved to .env):"
 echo "  POSTGRES_PASSWORD: $DB_PASSWORD"
-echo "  REDIS_PASSWORD:    $REDIS_PASSWORD"
 echo "  SECRET_KEY:        $SECRET_KEY"
 echo ""
 echo "Next steps:"
