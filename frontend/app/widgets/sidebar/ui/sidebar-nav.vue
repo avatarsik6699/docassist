@@ -89,16 +89,13 @@ const isDark = computed({
           {{ authStore.user.role }}
         </UBadge>
       </div>
-      <UButton
-        color="error"
-        variant="ghost"
-        block
-        size="sm"
-        icon="i-heroicons-arrow-left-on-rectangle"
-        @click="authStore.logout()"
+      <NuxtLink
+        to="/logout"
+        class="flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-rose-600 transition hover:bg-rose-50"
       >
+        <UIcon name="i-heroicons-arrow-left-on-rectangle" />
         {{ t('login') }} (Logout)
-      </UButton>
+      </NuxtLink>
     </div>
   </aside>
 </template>

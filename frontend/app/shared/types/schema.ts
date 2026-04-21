@@ -124,6 +124,75 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/patients/{patient_id}/medications': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Patient Medications */
+    get: operations['list_patient_medications_api_v1_patients__patient_id__medications_get'];
+    put?: never;
+    /** Create Patient Medication */
+    post: operations['create_patient_medication_api_v1_patients__patient_id__medications_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/medications/current': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Current Medications */
+    get: operations['list_current_medications_api_v1_medications_current_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/medications/{medication_id}/adherence': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Create Adherence Log */
+    post: operations['create_adherence_log_api_v1_medications__medication_id__adherence_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/patients/{patient_id}/adherence': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Patient Adherence Logs */
+    get: operations['list_patient_adherence_logs_api_v1_patients__patient_id__adherence_get'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -142,6 +211,60 @@ export interface components {
        * @enum {string}
        */
       onboarding_status: 'pending' | 'completed';
+    };
+    /** AdherenceLogItem */
+    AdherenceLogItem: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Medication Id
+       * Format: uuid
+       */
+      medication_id: string;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: 'taken' | 'missed' | 'modified';
+      /** Deviation Note */
+      deviation_note: string | null;
+      /**
+       * Logged At
+       * Format: date-time
+       */
+      logged_at: string;
+    };
+    /** AdherenceLogListResponse */
+    AdherenceLogListResponse: {
+      /** Items */
+      items: components['schemas']['AdherenceLogItem'][];
+    };
+    /** CreateAdherenceLogRequest */
+    CreateAdherenceLogRequest: {
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: 'taken' | 'missed' | 'modified';
+      /** Deviation Note */
+      deviation_note?: string | null;
+      /** Logged At */
+      logged_at?: string | null;
+    };
+    /** CreateMedicationRequest */
+    CreateMedicationRequest: {
+      /** Name */
+      name: string;
+      /** Dosage Instructions */
+      dosage_instructions: string;
+      /**
+       * Is Active
+       * @default true
+       */
+      is_active: boolean;
     };
     /** CreatePatientRequest */
     CreatePatientRequest: {
@@ -189,6 +312,49 @@ export interface components {
        * @default logged out
        */
       message: string;
+    };
+    /** MedicationItem */
+    MedicationItem: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Name */
+      name: string;
+      /** Dosage Instructions */
+      dosage_instructions: string;
+      /** Is Active */
+      is_active: boolean;
+    };
+    /** MedicationListResponse */
+    MedicationListResponse: {
+      /** Items */
+      items: components['schemas']['MedicationItem'][];
+    };
+    /** MedicationOut */
+    MedicationOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Name */
+      name: string;
+      /** Dosage Instructions */
+      dosage_instructions: string;
+      /** Is Active */
+      is_active: boolean;
+      /**
+       * Patient User Id
+       * Format: uuid
+       */
+      patient_user_id: string;
+      /**
+       * Doctor User Id
+       * Format: uuid
+       */
+      doctor_user_id: string;
     };
     /** PatientRosterItem */
     PatientRosterItem: {
@@ -468,6 +634,158 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['UserOut'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  list_patient_medications_api_v1_patients__patient_id__medications_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        patient_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['MedicationListResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  create_patient_medication_api_v1_patients__patient_id__medications_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        patient_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateMedicationRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['MedicationOut'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  list_current_medications_api_v1_medications_current_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['MedicationListResponse'];
+        };
+      };
+    };
+  };
+  create_adherence_log_api_v1_medications__medication_id__adherence_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        medication_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateAdherenceLogRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AdherenceLogItem'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  list_patient_adherence_logs_api_v1_patients__patient_id__adherence_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        patient_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AdherenceLogListResponse'];
         };
       };
       /** @description Validation Error */

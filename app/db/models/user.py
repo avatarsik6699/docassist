@@ -31,3 +31,6 @@ class User(UUIDMixin, TimestampMixin, Base):
         back_populates="doctor",
         foreign_keys="PatientProfile.doctor_user_id",
     )
+    medications = relationship("Medication", foreign_keys="Medication.patient_user_id")
+    managed_medications = relationship("Medication", foreign_keys="Medication.doctor_user_id")
+    adherence_logs = relationship("AdherenceLog", foreign_keys="AdherenceLog.patient_user_id")

@@ -1,27 +1,67 @@
 <script setup lang="ts">
+import { useAdherenceStore } from '@features/adherence/model/adherence-store';
+import AdherenceLogForm from '@features/adherence/ui/adherence-log-form.vue';
 import { useAuthStore } from '@features/auth/model/auth-store';
+import { useMedicationStore } from '@features/medications/model/medication-store';
+import PatientMedicationList from '@features/medications/ui/patient-medication-list.vue';
 
 definePageMeta({ layout: 'default' });
 
 const authStore = useAuthStore();
+const medicationStore = useMedicationStore();
+const adherenceStore = useAdherenceStore();
 const isDoctor = computed(() => authStore.user?.role === 'doctor');
 const isPatient = computed(() => authStore.user?.role === 'patient');
+const pageError = ref<string | null>(null);
 
-async function handleLogout() {
-  await authStore.logout();
+async function loadPatientData() {
+  if (!isPatient.value || authStore.requiresAccountSetup) {
+    return;
+  }
+
+  try {
+    await medicationStore.loadCurrentMedications();
+  } catch (err: unknown) {
+    pageError.value = err instanceof Error ? err.message : 'Unable to load medications.';
+  }
 }
+
+async function handleSubmitAdherence(payload: {
+  medicationId: string;
+  status: 'taken' | 'missed' | 'modified';
+  deviationNote: string | null;
+}) {
+  pageError.value = null;
+  try {
+    await adherenceStore.submitLog(payload);
+  } catch (err: unknown) {
+    pageError.value = err instanceof Error ? err.message : 'Unable to save adherence.';
+  }
+}
+
+onMounted(async () => {
+  if (!authStore.user) {
+    await authStore.fetchMe();
+  }
+
+  await loadPatientData();
+});
 </script>
 
 <template>
   <div class="space-y-6">
     <div class="space-y-2">
-      <p class="eyebrow">Authenticated Area</p>
+      <p class="eyebrow">Phase 03</p>
       <h1 class="text-3xl font-semibold tracking-tight text-slate-950">Dashboard</h1>
       <p class="max-w-2xl text-sm leading-6 text-slate-600">
-        Phase 02 turns the shell into a real onboarding hub: doctors can manage patient access, and
-        patient sessions are guided through first-login setup.
+        Medication tracking extends the authenticated shell with a shared record: doctors assign
+        active medications, and patients log whether each medication was actually taken.
       </p>
     </div>
+
+    <p v-if="pageError" class="text-sm text-rose-600" data-testid="dashboard-page-error">
+      {{ pageError }}
+    </p>
 
     <UCard data-testid="dashboard-shell" class="shadow-sm ring-1 ring-slate-200/80">
       <template #header>
@@ -34,14 +74,13 @@ async function handleLogout() {
             <UBadge color="primary" variant="subtle">
               {{ authStore.user?.role ?? 'unknown' }}
             </UBadge>
-            <UButton
-              color="neutral"
-              variant="soft"
+            <NuxtLink
+              to="/logout"
               data-testid="logout-button"
-              @click="handleLogout"
+              class="inline-flex items-center justify-center rounded-md bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-200"
             >
               Log out
-            </UButton>
+            </NuxtLink>
           </div>
         </div>
       </template>
@@ -75,14 +114,15 @@ async function handleLogout() {
         <div>
           <h3 class="text-lg font-semibold text-slate-950">Doctor workflow</h3>
           <p class="text-sm text-slate-500">
-            Open the roster to create or reactivate patient access.
+            Open the roster to manage patient access, assign medications, and review adherence.
           </p>
         </div>
       </template>
 
       <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <p class="max-w-2xl text-sm leading-6 text-slate-600">
-          The roster is now the control point for doctor-managed onboarding in MVP.
+          The roster now acts as the doctor workspace for onboarding, medication assignment, and
+          recent adherence review.
         </p>
         <NuxtLink
           to="/patients"
@@ -111,7 +151,7 @@ async function handleLogout() {
           {{
             authStore.requiresAccountSetup
               ? 'Your first-login setup is still pending. Finish it before accessing the rest of the app.'
-              : 'Your onboarding is complete. Later phases will unlock medication, questionnaires, and reporting here.'
+              : 'Your onboarding is complete. Your current medication list is shown below, and you can log adherence directly from this dashboard.'
           }}
         </p>
         <NuxtLink
@@ -123,5 +163,21 @@ async function handleLogout() {
         </NuxtLink>
       </div>
     </UCard>
+
+    <template v-if="isPatient && !authStore.requiresAccountSetup">
+      <PatientMedicationList
+        :items="medicationStore.patientItems"
+        :is-loading="medicationStore.isLoadingPatientItems"
+        empty-message="No active medications have been assigned yet."
+      />
+
+      <AdherenceLogForm
+        :medications="medicationStore.patientItems"
+        :is-submitting="adherenceStore.isSubmitting"
+        :error="adherenceStore.error"
+        :success-message="adherenceStore.successMessage"
+        @submit="handleSubmitAdherence"
+      />
+    </template>
   </div>
 </template>

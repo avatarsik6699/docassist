@@ -273,6 +273,7 @@ PY
 
 extract_phase_smoke_override() {
   python3 - "$PHASE_FILE" <<'PY'
+import base64
 from pathlib import Path
 import re
 import sys
@@ -287,23 +288,26 @@ match = re.search(
 if not match:
     raise SystemExit(0)
 
-command = ""
+command_lines = []
 expected = ""
 
 for raw_line in match.group("body").splitlines():
-    line = raw_line.strip()
-    if not line:
+    line = raw_line.rstrip()
+    stripped = line.strip()
+    if not stripped:
+        if command_lines:
+            break
         continue
-    if line.startswith("#"):
-        if line.startswith("# expected:") and not expected:
-            expected = line[len("# expected:"):].strip()
+    if stripped.startswith("#"):
+        if stripped.startswith("# expected:") and not expected:
+            expected = stripped[len("# expected:"):].strip()
         continue
-    if not command:
-        command = line
+    command_lines.append(line)
 
-if command:
-    print(command)
-    print(expected)
+if command_lines:
+    command = "\n".join(command_lines)
+    print(base64.b64encode(command.encode()).decode())
+    print(base64.b64encode(expected.encode()).decode())
 PY
 }
 
@@ -408,10 +412,16 @@ SMOKE_EXPECTED='"status":"ok"'
 if [[ -n "$SMOKE_OVERRIDE" ]]; then
   mapfile -t SMOKE_OVERRIDE_LINES <<<"$SMOKE_OVERRIDE"
   if [[ "${#SMOKE_OVERRIDE_LINES[@]}" -ge 1 && -n "${SMOKE_OVERRIDE_LINES[0]}" ]]; then
-    SMOKE_COMMAND="${SMOKE_OVERRIDE_LINES[0]}"
+    SMOKE_COMMAND="$(
+      printf '%s' "${SMOKE_OVERRIDE_LINES[0]}" \
+        | python3 -c 'import base64, sys; print(base64.b64decode(sys.stdin.read()).decode(), end="")'
+    )"
   fi
-  if [[ "${#SMOKE_OVERRIDE_LINES[@]}" -ge 2 ]]; then
-    SMOKE_EXPECTED="${SMOKE_OVERRIDE_LINES[1]}"
+  if [[ "${#SMOKE_OVERRIDE_LINES[@]}" -ge 2 && -n "${SMOKE_OVERRIDE_LINES[1]}" ]]; then
+    SMOKE_EXPECTED="$(
+      printf '%s' "${SMOKE_OVERRIDE_LINES[1]}" \
+        | python3 -c 'import base64, sys; print(base64.b64decode(sys.stdin.read()).decode(), end="")'
+    )"
   fi
 fi
 
@@ -421,9 +431,6 @@ if run_cmd SMOKE_OUTPUT bash -lc "$SMOKE_COMMAND"; then
     if [[ "$SMOKE_OUTPUT" == *"$SMOKE_EXPECTED"* ]]; then
       STATUS_SMOKE="PASS"
       DETAIL_SMOKE="$SMOKE_OUTPUT"
-    elif [[ -n "$SMOKE_OVERRIDE" ]]; then
-      STATUS_SMOKE="PASS"
-      DETAIL_SMOKE="override command succeeded; expected note: $SMOKE_EXPECTED; output: $SMOKE_OUTPUT"
     else
       STATUS_SMOKE="FAIL"
       DETAIL_SMOKE="unexpected response: $SMOKE_OUTPUT"

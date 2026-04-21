@@ -6,6 +6,28 @@
 
 ---
 
+## v1.4 — 2026-04-21 — Phase 03 Contract Synced
+
+**Type**: phase-completion
+**Author**: Codex (`/context-update`)
+**Triggered by**: Phase 03 implementation landed and the medication tracking plus adherence contract became active
+
+### Changes
+- Added medication tracking and adherence logging to the shared repository contract snapshot
+- Recorded the new doctor and patient API surface for medication assignment, current medication lookup, adherence submission, and adherence history review
+- Advanced the schema snapshot to Alembic head `0003_medications_and_adherence`
+
+### Affected Phases
+- PHASE_03 — implementation synchronized into the shared contract snapshot after the phase deliverables landed
+
+### Contract Updates
+- `CONTEXT.md` bumped from `v1.3` to `v1.4`
+- Added `Medication` and `AdherenceLog` to the active core model snapshot
+- Appended medication and adherence endpoints and expanded the schema table snapshot to include `medications` and `adherence_logs`
+
+### Notes
+This is an additive bump because Phase 03 extends the active doctor-patient workflow without replacing the existing Phase 01 or Phase 02 contract surface.
+
 ## v1.3 — 2026-04-21 — Phase 02 Contract Synced
 
 **Type**: phase-completion
