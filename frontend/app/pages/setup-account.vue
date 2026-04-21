@@ -2,6 +2,8 @@
 definePageMeta({ layout: 'default' });
 
 const authStore = useAuthStore();
+const { t } = useI18n();
+const localePath = useLocalePath();
 
 const isHydrated = ref(false);
 const newPassword = ref('');
@@ -15,7 +17,7 @@ onMounted(async () => {
   }
 
   if (authStore.user?.role !== 'patient' || !authStore.requiresAccountSetup) {
-    await navigateTo('/dashboard');
+    await navigateTo(localePath('/dashboard'));
   }
 
   isHydrated.value = true;
@@ -23,12 +25,12 @@ onMounted(async () => {
 
 async function handleSubmit() {
   if (newPassword.value.length < 8) {
-    errorMsg.value = 'Use at least 8 characters.';
+    errorMsg.value = t('setupAccount.validation.minLength');
     return;
   }
 
   if (newPassword.value !== confirmPassword.value) {
-    errorMsg.value = 'Passwords must match.';
+    errorMsg.value = t('setupAccount.validation.passwordMismatch');
     return;
   }
 
@@ -37,9 +39,9 @@ async function handleSubmit() {
 
   try {
     await authStore.setupAccount(newPassword.value);
-    await navigateTo('/dashboard', { replace: true });
+    await navigateTo(localePath('/dashboard'), { replace: true });
   } catch (err: unknown) {
-    errorMsg.value = err instanceof Error ? err.message : 'Unable to save password.';
+    errorMsg.value = err instanceof Error ? err.message : t('setupAccount.validation.unableToSave');
   } finally {
     isSaving.value = false;
   }
@@ -50,9 +52,15 @@ async function handleSubmit() {
   <div class="mx-auto max-w-2xl space-y-6">
     <div class="space-y-2">
       <p class="eyebrow">Patient Setup</p>
-      <h1 class="text-3xl font-semibold tracking-tight text-slate-950">Set a permanent password</h1>
+      <h1 class="text-3xl font-semibold tracking-tight text-slate-950">
+        {{ t('setupAccount.title') }}
+      </h1>
       <p class="text-sm leading-6 text-slate-600">
-        This one-time step finishes onboarding for {{ authStore.user?.email ?? 'your account' }}.
+        {{
+          t('setupAccount.subtitle', {
+            email: authStore.user?.email ?? t('setupAccount.fallbackAccount'),
+          })
+        }}
       </p>
     </div>
 
@@ -60,7 +68,7 @@ async function handleSubmit() {
       <form class="space-y-4" @submit.prevent="handleSubmit">
         <div>
           <label for="new-password" class="mb-1 block text-sm font-medium text-slate-700">
-            New password
+            {{ t('setupAccount.newPassword') }}
           </label>
           <input
             id="new-password"
@@ -76,7 +84,7 @@ async function handleSubmit() {
 
         <div>
           <label for="confirm-password" class="mb-1 block text-sm font-medium text-slate-700">
-            Confirm password
+            {{ t('setupAccount.confirmPassword') }}
           </label>
           <input
             id="confirm-password"
@@ -100,7 +108,7 @@ async function handleSubmit() {
           :disabled="!isHydrated || isSaving"
           data-testid="setup-account-submit"
         >
-          {{ isSaving ? 'Saving…' : 'Save password' }}
+          {{ isSaving ? t('common.saving') : t('setupAccount.savePassword') }}
         </button>
       </form>
     </section>

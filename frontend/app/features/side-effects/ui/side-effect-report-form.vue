@@ -19,6 +19,7 @@ const emit = defineEmits<{
     },
   ];
 }>();
+const { t } = useI18n();
 
 const medicationId = ref<string>('');
 const severity = ref<SideEffectSeverity>('mild');
@@ -64,16 +65,18 @@ function handleSubmit() {
 <template>
   <section class="space-y-4 rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm">
     <div class="space-y-2">
-      <p class="eyebrow">Safety reporting</p>
-      <h2 class="text-2xl font-semibold tracking-tight text-slate-950">Report side effects</h2>
+      <p class="eyebrow">{{ t('sideEffectsForm.eyebrow') }}</p>
+      <h2 class="text-2xl font-semibold tracking-tight text-slate-950">
+        {{ t('sideEffectsForm.title') }}
+      </h2>
       <p class="max-w-2xl text-sm leading-6 text-slate-600">
-        Share symptoms between visits so your doctor can quickly spot severe changes and follow up.
+        {{ t('sideEffectsForm.subtitle') }}
       </p>
     </div>
 
     <form class="grid gap-3" @submit.prevent="handleSubmit">
       <label for="side-effect-medication" class="text-sm font-medium text-slate-700">
-        Related medication
+        {{ t('sideEffectsForm.relatedMedication') }}
       </label>
       <select
         id="side-effect-medication"
@@ -82,13 +85,15 @@ function handleSubmit() {
         data-testid="side-effect-medication-select"
         :disabled="props.isSubmitting"
       >
-        <option value="">Not sure / none</option>
+        <option value="">{{ t('sideEffectsForm.notSureNone') }}</option>
         <option v-for="item in props.medications" :key="item.id" :value="item.id">
           {{ item.name }}
         </option>
       </select>
 
-      <label for="side-effect-severity" class="text-sm font-medium text-slate-700">Severity</label>
+      <label for="side-effect-severity" class="text-sm font-medium text-slate-700">
+        {{ t('common.severity') }}
+      </label>
       <select
         id="side-effect-severity"
         v-model="severity"
@@ -96,28 +101,32 @@ function handleSubmit() {
         data-testid="side-effect-severity-select"
         :disabled="props.isSubmitting"
       >
-        <option value="mild">Mild</option>
-        <option value="moderate">Moderate</option>
-        <option value="severe">Severe</option>
+        <option value="mild">{{ t('statuses.severity.mild') }}</option>
+        <option value="moderate">{{ t('statuses.severity.moderate') }}</option>
+        <option value="severe">{{ t('statuses.severity.severe') }}</option>
       </select>
 
-      <label for="side-effect-symptom" class="text-sm font-medium text-slate-700">Symptom</label>
+      <label for="side-effect-symptom" class="text-sm font-medium text-slate-700">
+        {{ t('common.symptom') }}
+      </label>
       <input
         id="side-effect-symptom"
         v-model="symptom"
         class="field-input"
         type="text"
-        placeholder="e.g. persistent nausea"
+        :placeholder="t('sideEffectsForm.symptomPlaceholder')"
         data-testid="side-effect-symptom-input"
         :disabled="props.isSubmitting"
       />
 
-      <label for="side-effect-note" class="text-sm font-medium text-slate-700">Clinical note</label>
+      <label for="side-effect-note" class="text-sm font-medium text-slate-700">
+        {{ t('sideEffectsForm.clinicalNote') }}
+      </label>
       <textarea
         id="side-effect-note"
         v-model="note"
         class="field-input min-h-24"
-        placeholder="Optional context (timing, triggers, changes)"
+        :placeholder="t('sideEffectsForm.notePlaceholder')"
         data-testid="side-effect-note-input"
         :disabled="props.isSubmitting"
       />
@@ -140,7 +149,7 @@ function handleSubmit() {
           data-testid="side-effect-submit"
           :disabled="props.isSubmitting || !symptom.trim()"
         >
-          {{ props.isSubmitting ? 'Saving…' : 'Report side effect' }}
+          {{ props.isSubmitting ? t('common.saving') : t('sideEffectsForm.reportSideEffect') }}
         </button>
       </div>
     </form>

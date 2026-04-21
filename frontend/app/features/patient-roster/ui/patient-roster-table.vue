@@ -10,21 +10,24 @@ const props = defineProps<{
 const emit = defineEmits<{
   activate: [patientId: string];
 }>();
+const { t } = useI18n();
 </script>
 
 <template>
   <section class="space-y-4">
     <div class="space-y-2">
-      <p class="eyebrow">Roster</p>
-      <h2 class="text-2xl font-semibold tracking-tight text-slate-950">Assigned patients</h2>
+      <p class="eyebrow">{{ t('patientRosterTable.eyebrow') }}</p>
+      <h2 class="text-2xl font-semibold tracking-tight text-slate-950">
+        {{ t('patientRosterTable.title') }}
+      </h2>
       <p class="max-w-2xl text-sm leading-6 text-slate-600">
-        Doctors can see only their own patients, along with onboarding and activation state.
+        {{ t('patientRosterTable.subtitle') }}
       </p>
     </div>
 
-    <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white/90 shadow-sm">
+    <div class="overflow-x-auto rounded-3xl border border-slate-200 bg-white/90 shadow-sm">
       <div v-if="props.isLoading" class="p-6 text-sm text-slate-500" data-testid="patients-loading">
-        Loading patients…
+        {{ t('patientRosterTable.loading') }}
       </div>
 
       <div
@@ -32,7 +35,7 @@ const emit = defineEmits<{
         class="p-6 text-sm text-slate-500"
         data-testid="patients-empty"
       >
-        No patients yet. Create the first patient account above.
+        {{ t('patientRosterTable.empty') }}
       </div>
 
       <table v-else class="min-w-full divide-y divide-slate-200" data-testid="patients-table">
@@ -41,22 +44,22 @@ const emit = defineEmits<{
             <th
               class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500"
             >
-              Email
+              {{ t('common.email') }}
             </th>
             <th
               class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500"
             >
-              Status
+              {{ t('common.status') }}
             </th>
             <th
               class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500"
             >
-              Onboarding
+              {{ t('patientRosterTable.onboarding') }}
             </th>
             <th
               class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-[0.18em] text-slate-500"
             >
-              Action
+              {{ t('common.action') }}
             </th>
           </tr>
         </thead>
@@ -76,7 +79,7 @@ const emit = defineEmits<{
                   item.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-700'
                 "
               >
-                {{ item.is_active ? 'Active' : 'Inactive' }}
+                {{ item.is_active ? t('common.active') : t('common.inactive') }}
               </span>
             </td>
             <td class="px-4 py-4 text-sm text-slate-600 capitalize">
@@ -91,10 +94,14 @@ const emit = defineEmits<{
                 :data-testid="`activate-patient-${item.id}`"
                 @click="emit('activate', item.id)"
               >
-                {{ props.activePatientId === item.id ? 'Activating…' : 'Activate' }}
+                {{
+                  props.activePatientId === item.id
+                    ? t('patientRosterTable.activating')
+                    : t('patientRosterTable.activate')
+                }}
               </button>
               <span v-else class="text-xs font-medium uppercase tracking-[0.18em] text-slate-400">
-                Live
+                {{ t('patientRosterTable.live') }}
               </span>
             </td>
           </tr>

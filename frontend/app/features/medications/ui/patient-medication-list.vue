@@ -6,21 +6,25 @@ const props = defineProps<{
   isLoading: boolean;
   emptyMessage: string;
 }>();
+const { t } = useI18n();
 </script>
 
 <template>
   <section class="space-y-4">
     <div class="space-y-2">
-      <p class="eyebrow">Current medications</p>
-      <h2 class="text-2xl font-semibold tracking-tight text-slate-950">Medication list</h2>
+      <p class="eyebrow">{{ t('medicationList.eyebrow') }}</p>
+      <h2 class="text-2xl font-semibold tracking-tight text-slate-950">
+        {{ t('medicationList.title') }}
+      </h2>
       <p class="max-w-2xl text-sm leading-6 text-slate-600">
-        Active medications stay visible here so the current plan and adherence log always point to
-        the same record.
+        {{ t('medicationList.subtitle') }}
       </p>
     </div>
 
     <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white/90 shadow-sm">
-      <div v-if="props.isLoading" class="p-6 text-sm text-slate-500">Loading medications…</div>
+      <div v-if="props.isLoading" class="p-6 text-sm text-slate-500">
+        {{ t('medicationList.loading') }}
+      </div>
 
       <div
         v-else-if="props.items.length === 0"
@@ -38,7 +42,9 @@ const props = defineProps<{
         >
           <div>
             <p class="text-sm font-semibold text-slate-950">{{ item.name }}</p>
-            <p class="mt-1 text-xs uppercase tracking-[0.18em] text-emerald-700">Active</p>
+            <p class="mt-1 text-xs uppercase tracking-[0.18em] text-emerald-700">
+              {{ t('common.active') }}
+            </p>
           </div>
           <p class="text-sm leading-6 text-slate-600">{{ item.dosage_instructions }}</p>
         </li>

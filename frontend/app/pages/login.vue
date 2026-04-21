@@ -4,6 +4,8 @@ import { useAuthStore } from '@features/auth/model/auth-store';
 definePageMeta({ layout: 'blank' });
 
 const authStore = useAuthStore();
+const { t } = useI18n();
+const localePath = useLocalePath();
 
 const isHydrated = ref(false);
 const email = ref('');
@@ -16,15 +18,15 @@ onMounted(() => {
 
 async function handleLogin() {
   if (!email.value.trim() || !password.value) {
-    errorMsg.value = 'Email and password are required.';
+    errorMsg.value = t('login.validation.required');
     return;
   }
   errorMsg.value = null;
   try {
     await authStore.login(email.value.trim(), password.value);
-    await navigateTo('/dashboard', { replace: true });
+    await navigateTo(localePath('/dashboard'), { replace: true });
   } catch {
-    errorMsg.value = 'Invalid email or password. Please try again.';
+    errorMsg.value = t('login.validation.invalid');
   }
 }
 </script>
@@ -32,16 +34,17 @@ async function handleLogin() {
 <template>
   <div class="login-shell w-full max-w-md rounded-3xl p-8 shadow-xl space-y-8">
     <div class="space-y-3 text-center">
-      <p class="eyebrow">Phase 01</p>
       <h1 class="text-3xl font-semibold tracking-tight text-slate-950">Docassist</h1>
       <p class="text-sm leading-6 text-slate-600">
-        Sign in with the seeded admin account to verify the Phase 01 auth foundation.
+        {{ t('login.subtitle') }}
       </p>
     </div>
 
     <form class="space-y-4" @submit.prevent="handleLogin">
       <div>
-        <label for="email" class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+        <label for="email" class="block text-sm font-medium text-slate-700 mb-1">
+          {{ t('common.email') }}
+        </label>
         <input
           id="email"
           v-model="email"
@@ -56,7 +59,9 @@ async function handleLogin() {
       </div>
 
       <div>
-        <label for="password" class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+        <label for="password" class="block text-sm font-medium text-slate-700 mb-1">
+          {{ t('common.password') }}
+        </label>
         <input
           id="password"
           v-model="password"
@@ -78,13 +83,8 @@ async function handleLogin() {
         data-testid="login-submit"
         class="w-full rounded-2xl bg-slate-950 px-4 py-3 text-sm font-medium text-white transition hover:bg-slate-800 disabled:opacity-50"
       >
-        {{ authStore.isLoading ? 'Signing in…' : 'Sign in' }}
+        {{ authStore.isLoading ? t('login.signingIn') : t('login.signIn') }}
       </button>
     </form>
-
-    <p class="text-xs text-center text-slate-500">
-      Default: <span class="font-mono">admin@example.com</span> /
-      <span class="font-mono">changeme123</span>
-    </p>
   </div>
 </template>

@@ -1,5 +1,5 @@
 import { computed, ref } from 'vue';
-import { navigateTo, refreshCookie, useNuxtApp, useCookie } from '#imports';
+import { navigateTo, refreshCookie, useNuxtApp, useCookie, useLocalePath } from '#imports';
 import { defineStore } from 'pinia';
 
 export const AUTH_COOKIE_CONFIG = {
@@ -20,6 +20,7 @@ export interface AuthUser {
 }
 
 export const useAuthStore = defineStore('auth', () => {
+  const localePath = useLocalePath();
   const tokenCookie = useCookie<TokenCookieValue>(AUTH_COOKIE_CONFIG.key, {
     maxAge: 60 * 60,
     path: '/',
@@ -117,7 +118,7 @@ export const useAuthStore = defineStore('auth', () => {
     refreshCookie(AUTH_COOKIE_CONFIG.key);
 
     if (redirect) {
-      await navigateTo('/login');
+      await navigateTo(localePath('/login'));
     }
   }
 

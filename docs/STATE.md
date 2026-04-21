@@ -18,6 +18,7 @@
 | PHASE_03 | ✅ done | v0.3.0 | ✅   | ✅      | Contract synced after landing medication assignment, patient adherence logging, and doctor adherence review |
 | PHASE_04 | ✅ done | v0.4.0 | ✅ | ✅ | Contract synced after landing questionnaire assignment, submission, and scoring for PHQ-9/GAD-7 |
 | PHASE_05 | ✅ done | v0.5.0 | ✅ | ✅ | Contract synced after landing doctor patient summary aggregation, safety highlighting, and patient side-effect reporting |
+| PHASE_06 | ⏳ pending | v0.6.0 | — | — | Scaffolded; `docs/SPEC.md` does not yet define PHASE_06 scope |
 
 <!-- Add new rows here via /phase-init N -->
 

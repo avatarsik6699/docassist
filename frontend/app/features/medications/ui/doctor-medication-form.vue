@@ -8,6 +8,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   submit: [payload: { name: string; dosage_instructions: string }];
 }>();
+const { t } = useI18n();
 
 const name = ref('');
 const dosageInstructions = ref('');
@@ -33,13 +34,12 @@ function handleSubmit() {
 <template>
   <section class="space-y-4">
     <div class="space-y-2">
-      <p class="eyebrow">Medication plan</p>
+      <p class="eyebrow">{{ t('doctorMedicationForm.eyebrow') }}</p>
       <h2 class="text-2xl font-semibold tracking-tight text-slate-950">
-        Assign current medication
+        {{ t('doctorMedicationForm.title') }}
       </h2>
       <p class="max-w-2xl text-sm leading-6 text-slate-600">
-        Record the current medication list for the selected patient and keep dosage instructions
-        visible for future follow-up.
+        {{ t('doctorMedicationForm.subtitle') }}
       </p>
     </div>
 
@@ -51,13 +51,15 @@ function handleSubmit() {
         class="rounded-2xl bg-slate-50 p-3 text-sm text-slate-600"
         data-testid="selected-patient-banner"
       >
-        <span v-if="props.patientEmail">Managing medications for {{ props.patientEmail }}</span>
-        <span v-else>Select a patient above to start medication tracking.</span>
+        <span v-if="props.patientEmail">
+          {{ t('doctorMedicationForm.managingFor', { email: props.patientEmail }) }}
+        </span>
+        <span v-else>{{ t('doctorMedicationForm.selectPatientFirst') }}</span>
       </div>
 
-      <label for="medication-name" class="text-sm font-medium text-slate-700"
-        >Medication name</label
-      >
+      <label for="medication-name" class="text-sm font-medium text-slate-700">{{
+        t('doctorMedicationForm.medicationName')
+      }}</label>
       <input
         id="medication-name"
         v-model="name"
@@ -70,7 +72,7 @@ function handleSubmit() {
       />
 
       <label for="medication-dosage" class="text-sm font-medium text-slate-700">
-        Dosage instructions
+        {{ t('doctorMedicationForm.dosageInstructions') }}
       </label>
       <textarea
         id="medication-dosage"
@@ -97,7 +99,7 @@ function handleSubmit() {
           data-testid="create-medication-submit"
           :disabled="props.isSubmitting || !props.patientEmail"
         >
-          {{ props.isSubmitting ? 'Saving…' : 'Save medication' }}
+          {{ props.isSubmitting ? t('common.saving') : t('doctorMedicationForm.saveMedication') }}
         </button>
       </div>
     </form>

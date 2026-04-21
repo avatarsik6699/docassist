@@ -11,6 +11,7 @@ const { apiMock, navigateToMock, refreshCookieMock, cookieStore } = vi.hoisted((
 
 vi.mock('#imports', () => ({
   navigateTo: navigateToMock,
+  useLocalePath: () => (path: string) => path,
   useNuxtApp: () => ({
     $api: apiMock,
   }),

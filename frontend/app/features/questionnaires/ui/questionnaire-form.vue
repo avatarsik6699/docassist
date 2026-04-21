@@ -6,31 +6,32 @@ const props = defineProps<{
   isSubmitting: boolean;
   error: string | null;
 }>();
+const { t } = useI18n();
 
 const emit = defineEmits<{
   submit: [payload: Record<string, number>];
 }>();
 
-const definitions: Record<QuestionnaireCode, { id: string; label: string }[]> = {
+const definitions: Record<QuestionnaireCode, { id: string }[]> = {
   'PHQ-9': [
-    { id: 'q1', label: 'Little interest or pleasure in doing things' },
-    { id: 'q2', label: 'Feeling down, depressed, or hopeless' },
-    { id: 'q3', label: 'Trouble falling or staying asleep, or sleeping too much' },
-    { id: 'q4', label: 'Feeling tired or having little energy' },
-    { id: 'q5', label: 'Poor appetite or overeating' },
-    { id: 'q6', label: 'Feeling bad about yourself' },
-    { id: 'q7', label: 'Trouble concentrating on things' },
-    { id: 'q8', label: 'Moving or speaking slowly or being fidgety/restless' },
-    { id: 'q9', label: 'Thoughts that you would be better off dead or of hurting yourself' },
+    { id: 'q1' },
+    { id: 'q2' },
+    { id: 'q3' },
+    { id: 'q4' },
+    { id: 'q5' },
+    { id: 'q6' },
+    { id: 'q7' },
+    { id: 'q8' },
+    { id: 'q9' },
   ],
   'GAD-7': [
-    { id: 'q1', label: 'Feeling nervous, anxious, or on edge' },
-    { id: 'q2', label: 'Not being able to stop or control worrying' },
-    { id: 'q3', label: 'Worrying too much about different things' },
-    { id: 'q4', label: 'Trouble relaxing' },
-    { id: 'q5', label: 'Being so restless that it is hard to sit still' },
-    { id: 'q6', label: 'Becoming easily annoyed or irritable' },
-    { id: 'q7', label: 'Feeling afraid as if something awful might happen' },
+    { id: 'q1' },
+    { id: 'q2' },
+    { id: 'q3' },
+    { id: 'q4' },
+    { id: 'q5' },
+    { id: 'q6' },
+    { id: 'q7' },
   ],
 };
 
@@ -55,6 +56,10 @@ watch(
 function handleSubmit() {
   emit('submit', { ...answers.value });
 }
+
+function questionLabel(questionId: string): string {
+  return t(`questionnaireForm.questions.${props.questionnaireCode}.${questionId}`);
+}
 </script>
 
 <template>
@@ -68,10 +73,10 @@ function handleSubmit() {
       :key="question.id"
       class="grid gap-2 rounded-2xl border border-slate-200 p-4"
     >
-      <p class="text-sm font-medium text-slate-900">{{ question.label }}</p>
-      <label :for="question.id" class="text-xs uppercase tracking-[0.12em] text-slate-500"
-        >Score</label
-      >
+      <p class="text-sm font-medium text-slate-900">{{ questionLabel(question.id) }}</p>
+      <label :for="question.id" class="text-xs uppercase tracking-[0.12em] text-slate-500">{{
+        t('common.score')
+      }}</label>
       <select
         :id="question.id"
         v-model.number="answers[question.id]"
@@ -97,7 +102,7 @@ function handleSubmit() {
         data-testid="questionnaire-submit"
         :disabled="props.isSubmitting"
       >
-        {{ props.isSubmitting ? 'Submitting…' : 'Submit questionnaire' }}
+        {{ props.isSubmitting ? t('questionnaireForm.submitting') : t('questionnaireForm.submit') }}
       </button>
     </div>
   </form>

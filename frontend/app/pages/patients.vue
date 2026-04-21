@@ -25,6 +25,8 @@ const adherenceStore = useAdherenceStore();
 const questionnaireStore = useQuestionnaireStore();
 const patientSummaryStore = usePatientSummaryStore();
 const sideEffectsStore = useSideEffectsStore();
+const { t, locale } = useI18n();
+const localePath = useLocalePath();
 
 const isDoctor = computed(() => authStore.user?.role === 'doctor');
 const pageError = ref<string | null>(null);
@@ -32,6 +34,47 @@ const selectedPatientId = ref<string | null>(null);
 const selectedPatient = computed<PatientRosterItem | null>(
   () => rosterStore.items.find((item) => item.id === selectedPatientId.value) ?? null
 );
+const dateTimeLocale = computed(() => (locale.value === 'ru' ? 'ru-RU' : 'en-US'));
+
+function formatDateTime(value: string): string {
+  return new Date(value).toLocaleString(dateTimeLocale.value);
+}
+
+function questionnaireStatusLabel(status: string): string {
+  if (status === 'assigned') {
+    return t('statuses.questionnaire.assigned');
+  }
+  if (status === 'completed') {
+    return t('statuses.questionnaire.completed');
+  }
+  return status;
+}
+
+function adherenceStatusLabel(status: string): string {
+  if (status === 'taken') {
+    return t('statuses.adherence.taken');
+  }
+  if (status === 'missed') {
+    return t('statuses.adherence.missed');
+  }
+  if (status === 'modified') {
+    return t('statuses.adherence.modified');
+  }
+  return status;
+}
+
+function sideEffectSeverityLabel(status: string): string {
+  if (status === 'mild') {
+    return t('statuses.severity.mild');
+  }
+  if (status === 'moderate') {
+    return t('statuses.severity.moderate');
+  }
+  if (status === 'severe') {
+    return t('statuses.severity.severe');
+  }
+  return status;
+}
 
 async function loadRoster() {
   if (!isDoctor.value) {
@@ -44,29 +87,37 @@ async function loadRoster() {
       selectedPatientId.value = items[0]?.id ?? null;
     }
   } catch (err: unknown) {
-    pageError.value = err instanceof Error ? err.message : 'Unable to load patients.';
+    pageError.value = err instanceof Error ? err.message : t('patientsPage.errors.loadPatients');
   }
 }
 
-async function loadSelectedPatientData() {
-  if (!selectedPatientId.value) {
+async function loadSelectedPatientData(patientId: string | null = selectedPatientId.value) {
+  if (!patientId) {
     medicationStore.doctorItems = [];
     adherenceStore.history = [];
     sideEffectsStore.history = [];
     patientSummaryStore.clearSummary();
+    questionnaireStore.doctorItems = [];
     return;
   }
 
   try {
     await Promise.all([
-      medicationStore.loadDoctorMedications(selectedPatientId.value),
-      adherenceStore.loadHistory(selectedPatientId.value),
-      questionnaireStore.loadDoctorAssignments(selectedPatientId.value),
-      sideEffectsStore.loadHistory(selectedPatientId.value),
-      patientSummaryStore.loadSummary(selectedPatientId.value),
+      medicationStore.loadDoctorMedications(patientId),
+      adherenceStore.loadHistory(patientId),
+      questionnaireStore.loadDoctorAssignments(patientId),
+      sideEffectsStore.loadHistory(patientId),
+      patientSummaryStore.loadSummary(patientId),
     ]);
   } catch (err: unknown) {
-    pageError.value = err instanceof Error ? err.message : 'Unable to load patient details.';
+    pageError.value =
+      err instanceof Error ? err.message : t('patientsPage.errors.loadPatientDetails');
+  }
+
+  // Selection can change while requests are in-flight. Re-load the latest
+  // selected patient to avoid stale responses overwriting the visible state.
+  if (selectedPatientId.value !== patientId) {
+    await loadSelectedPatientData(selectedPatientId.value);
   }
 }
 
@@ -79,7 +130,7 @@ async function handleCreatePatient(email: string) {
     }
     await loadSelectedPatientData();
   } catch (err: unknown) {
-    pageError.value = err instanceof Error ? err.message : 'Unable to create patient.';
+    pageError.value = err instanceof Error ? err.message : t('patientsPage.errors.createPatient');
   }
 }
 
@@ -88,7 +139,7 @@ async function handleActivatePatient(patientId: string) {
   try {
     await rosterStore.activatePatient(patientId);
   } catch (err: unknown) {
-    pageError.value = err instanceof Error ? err.message : 'Unable to activate patient.';
+    pageError.value = err instanceof Error ? err.message : t('patientsPage.errors.activatePatient');
   }
 }
 
@@ -101,7 +152,7 @@ async function handleCreateMedication(payload: { name: string; dosage_instructio
   try {
     await medicationStore.createMedication(selectedPatientId.value, payload);
   } catch (err: unknown) {
-    pageError.value = err instanceof Error ? err.message : 'Unable to save medication.';
+    pageError.value = err instanceof Error ? err.message : t('patientsPage.errors.saveMedication');
   }
 }
 
@@ -117,16 +168,17 @@ async function handleAssignQuestionnaire(payload: { questionnaireCode: Questionn
       payload.questionnaireCode
     );
   } catch (err: unknown) {
-    pageError.value = err instanceof Error ? err.message : 'Unable to assign questionnaire.';
+    pageError.value =
+      err instanceof Error ? err.message : t('patientsPage.errors.assignQuestionnaire');
   }
 }
 
-watch(selectedPatientId, async () => {
+watch(selectedPatientId, async (nextPatientId) => {
   pageError.value = null;
   if (!isDoctor.value) {
     return;
   }
-  await loadSelectedPatientData();
+  await loadSelectedPatientData(nextPatientId);
 });
 
 onMounted(async () => {
@@ -135,23 +187,22 @@ onMounted(async () => {
   }
 
   if (!isDoctor.value) {
-    await navigateTo('/dashboard');
+    await navigateTo(localePath('/dashboard'));
     return;
   }
 
   await loadRoster();
-  await loadSelectedPatientData();
 });
 </script>
 
 <template>
   <div class="space-y-8">
     <div class="space-y-2">
-      <p class="eyebrow">Phase 05</p>
-      <h1 class="text-3xl font-semibold tracking-tight text-slate-950">Patient roster</h1>
+      <h1 class="text-3xl font-semibold tracking-tight text-slate-950">
+        {{ t('patientsPage.title') }}
+      </h1>
       <p class="max-w-2xl text-sm leading-6 text-slate-600">
-        Create patient accounts, manage assigned treatment tasks, and review recent history with
-        safety highlighting in one place.
+        {{ t('patientsPage.subtitle') }}
       </p>
     </div>
 
@@ -176,21 +227,25 @@ onMounted(async () => {
 
     <section class="space-y-4 rounded-3xl border border-slate-200 bg-white/70 p-5 shadow-sm">
       <div class="space-y-2">
-        <p class="eyebrow">Patient context</p>
-        <h2 class="text-2xl font-semibold tracking-tight text-slate-950">Selected patient</h2>
+        <p class="eyebrow">{{ t('patientsPage.contextEyebrow') }}</p>
+        <h2 class="text-2xl font-semibold tracking-tight text-slate-950">
+          {{ t('patientsPage.selectedPatient') }}
+        </h2>
         <p class="max-w-2xl text-sm leading-6 text-slate-600">
-          Medication assignment and adherence review always apply to the currently selected patient.
+          {{ t('patientsPage.selectedPatientDescription') }}
         </p>
       </div>
 
-      <label for="patient-selector" class="text-sm font-medium text-slate-700">Patient</label>
+      <label for="patient-selector" class="text-sm font-medium text-slate-700">
+        {{ t('patientsPage.patientLabel') }}
+      </label>
       <select
         id="patient-selector"
         v-model="selectedPatientId"
         class="field-input max-w-xl"
         data-testid="doctor-medication-patient-select"
       >
-        <option disabled value="">Select patient</option>
+        <option disabled value="">{{ t('patientsPage.selectPatient') }}</option>
         <option v-for="item in rosterStore.items" :key="item.id" :value="item.id">
           {{ item.email }}
         </option>
@@ -220,28 +275,30 @@ onMounted(async () => {
     <PatientMedicationList
       :items="medicationStore.doctorItems"
       :is-loading="medicationStore.isLoadingDoctorItems"
-      empty-message="No active medications are recorded for this patient yet."
+      :empty-message="t('patientsPage.noActiveMedications')"
     />
 
     <section class="space-y-4">
       <div class="space-y-2">
-        <p class="eyebrow">Questionnaire history</p>
-        <h2 class="text-2xl font-semibold tracking-tight text-slate-950">Assignments</h2>
+        <p class="eyebrow">{{ t('patientsPage.questionnaireHistory') }}</p>
+        <h2 class="text-2xl font-semibold tracking-tight text-slate-950">
+          {{ t('patientsPage.assignments') }}
+        </h2>
       </div>
 
       <div
-        class="overflow-hidden rounded-3xl border border-slate-200 bg-white/90 shadow-sm"
+        class="overflow-x-auto rounded-3xl border border-slate-200 bg-white/90 shadow-sm"
         data-testid="doctor-questionnaire-history"
       >
         <div v-if="questionnaireStore.isLoadingDoctorItems" class="p-6 text-sm text-slate-500">
-          Loading questionnaires…
+          {{ t('patientsPage.loadingQuestionnaires') }}
         </div>
         <div
           v-else-if="questionnaireStore.doctorItems.length === 0"
           class="p-6 text-sm text-slate-500"
           data-testid="doctor-questionnaire-empty"
         >
-          No questionnaires assigned yet.
+          {{ t('patientsPage.noQuestionnairesAssigned') }}
         </div>
         <table v-else class="min-w-full divide-y divide-slate-200">
           <thead class="bg-slate-50">
@@ -249,17 +306,17 @@ onMounted(async () => {
               <th
                 class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500"
               >
-                Questionnaire
+                {{ t('common.questionnaire') }}
               </th>
               <th
                 class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500"
               >
-                Status
+                {{ t('common.status') }}
               </th>
               <th
                 class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500"
               >
-                Score
+                {{ t('common.score') }}
               </th>
             </tr>
           </thead>
@@ -268,15 +325,17 @@ onMounted(async () => {
               <td class="px-4 py-4 text-sm font-medium text-slate-900">
                 {{ item.questionnaire_code }}
               </td>
-              <td class="px-4 py-4 text-sm capitalize text-slate-600">{{ item.status }}</td>
+              <td class="px-4 py-4 text-sm capitalize text-slate-600">
+                {{ questionnaireStatusLabel(item.status) }}
+              </td>
               <td class="px-4 py-4 text-sm text-slate-600">
                 <span v-if="item.total_score !== null && item.total_score !== undefined">
                   {{ item.total_score }}
                   <span v-if="item.has_safety_signal" class="ml-2 font-medium text-rose-600">
-                    safety flag
+                    {{ t('common.safetyFlag') }}
                   </span>
                 </span>
-                <span v-else>Pending</span>
+                <span v-else>{{ t('common.pending') }}</span>
               </td>
             </tr>
           </tbody>
@@ -286,27 +345,28 @@ onMounted(async () => {
 
     <section class="space-y-4">
       <div class="space-y-2">
-        <p class="eyebrow">Adherence history</p>
-        <h2 class="text-2xl font-semibold tracking-tight text-slate-950">Recent logs</h2>
+        <p class="eyebrow">{{ t('patientsPage.adherenceHistory') }}</p>
+        <h2 class="text-2xl font-semibold tracking-tight text-slate-950">
+          {{ t('patientsPage.recentLogs') }}
+        </h2>
         <p class="max-w-2xl text-sm leading-6 text-slate-600">
-          Review the latest patient-reported adherence records as structured entries instead of
-          relying on memory during follow-up.
+          {{ t('patientsPage.adherenceDescription') }}
         </p>
       </div>
 
       <div
-        class="overflow-hidden rounded-3xl border border-slate-200 bg-white/90 shadow-sm"
+        class="overflow-x-auto rounded-3xl border border-slate-200 bg-white/90 shadow-sm"
         data-testid="doctor-adherence-history"
       >
         <div v-if="adherenceStore.isLoadingHistory" class="p-6 text-sm text-slate-500">
-          Loading adherence history…
+          {{ t('patientsPage.loadingAdherenceHistory') }}
         </div>
         <div
           v-else-if="adherenceStore.history.length === 0"
           class="p-6 text-sm text-slate-500"
           data-testid="doctor-adherence-empty"
         >
-          No adherence records have been submitted for this patient yet.
+          {{ t('patientsPage.noAdherenceRecords') }}
         </div>
         <table v-else class="min-w-full divide-y divide-slate-200">
           <thead class="bg-slate-50">
@@ -314,17 +374,17 @@ onMounted(async () => {
               <th
                 class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500"
               >
-                Time
+                {{ t('common.time') }}
               </th>
               <th
                 class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500"
               >
-                Status
+                {{ t('common.status') }}
               </th>
               <th
                 class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500"
               >
-                Note
+                {{ t('common.note') }}
               </th>
             </tr>
           </thead>
@@ -335,13 +395,13 @@ onMounted(async () => {
               :data-testid="`adherence-row-${item.id}`"
             >
               <td class="px-4 py-4 text-sm text-slate-600">
-                {{ new Date(item.logged_at).toLocaleString() }}
+                {{ formatDateTime(item.logged_at) }}
               </td>
               <td class="px-4 py-4 text-sm font-medium capitalize text-slate-900">
-                {{ item.status }}
+                {{ adherenceStatusLabel(item.status) }}
               </td>
               <td class="px-4 py-4 text-sm text-slate-600">
-                {{ item.deviation_note || 'No deviation note' }}
+                {{ item.deviation_note || t('patientsPage.noDeviationNote') }}
               </td>
             </tr>
           </tbody>
@@ -351,23 +411,25 @@ onMounted(async () => {
 
     <section class="space-y-4">
       <div class="space-y-2">
-        <p class="eyebrow">Side effects</p>
-        <h2 class="text-2xl font-semibold tracking-tight text-slate-950">Reported symptoms</h2>
+        <p class="eyebrow">{{ t('patientsPage.sideEffects') }}</p>
+        <h2 class="text-2xl font-semibold tracking-tight text-slate-950">
+          {{ t('patientsPage.reportedSymptoms') }}
+        </h2>
       </div>
 
       <div
-        class="overflow-hidden rounded-3xl border border-slate-200 bg-white/90 shadow-sm"
+        class="overflow-x-auto rounded-3xl border border-slate-200 bg-white/90 shadow-sm"
         data-testid="doctor-side-effects-history"
       >
         <div v-if="sideEffectsStore.isLoadingHistory" class="p-6 text-sm text-slate-500">
-          Loading side effects…
+          {{ t('patientsPage.loadingSideEffects') }}
         </div>
         <div
           v-else-if="sideEffectsStore.history.length === 0"
           class="p-6 text-sm text-slate-500"
           data-testid="doctor-side-effects-empty"
         >
-          No side-effect reports submitted yet.
+          {{ t('patientsPage.noSideEffects') }}
         </div>
         <table v-else class="min-w-full divide-y divide-slate-200">
           <thead class="bg-slate-50">
@@ -375,17 +437,17 @@ onMounted(async () => {
               <th
                 class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500"
               >
-                Severity
+                {{ t('common.severity') }}
               </th>
               <th
                 class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500"
               >
-                Symptom
+                {{ t('common.symptom') }}
               </th>
               <th
                 class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500"
               >
-                Note
+                {{ t('common.note') }}
               </th>
             </tr>
           </thead>
@@ -397,7 +459,7 @@ onMounted(async () => {
                   item.severity === 'severe' ? 'font-semibold text-rose-600' : 'text-slate-600'
                 "
               >
-                {{ item.severity }}
+                {{ sideEffectSeverityLabel(item.severity) }}
               </td>
               <td class="px-4 py-4 text-sm text-slate-900">{{ item.symptom }}</td>
               <td class="px-4 py-4 text-sm text-slate-600">{{ item.note ?? '—' }}</td>

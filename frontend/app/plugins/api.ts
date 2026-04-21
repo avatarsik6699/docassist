@@ -1,8 +1,9 @@
-import { defineNuxtPlugin, useRuntimeConfig, navigateTo, useCookie } from '#imports';
+import { defineNuxtPlugin, useRuntimeConfig, navigateTo, useCookie, useLocalePath } from '#imports';
 import { AUTH_COOKIE_CONFIG } from '@features/auth/model/auth-store';
 
 export default defineNuxtPlugin(() => {
   const config = useRuntimeConfig();
+  const localePath = useLocalePath();
   const rawApiBase = (import.meta.server ? config.apiBaseInternal : config.public.apiBase) as
     | string
     | undefined;
@@ -38,7 +39,7 @@ export default defineNuxtPlugin(() => {
         tokenCookie.value = null;
 
         if (import.meta.client) {
-          navigateTo('/login');
+          navigateTo(localePath('/login'));
         }
       }
     },

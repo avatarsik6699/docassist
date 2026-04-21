@@ -10,13 +10,14 @@ const props = defineProps<{
   sideEffectsHistory: SideEffectReportItem[];
   isLoading: boolean;
 }>();
+const { t } = useI18n();
 
 function flagLabel(flag: PatientSafetyFlag): string {
   if (flag.code === 'questionnaire_safety_signal') {
-    return 'Questionnaire safety signal';
+    return t('patientSummary.flags.questionnaireSafetySignal');
   }
   if (flag.code === 'severe_side_effect_reported') {
-    return 'Severe side effect reported';
+    return t('patientSummary.flags.severeSideEffectReported');
   }
   return flag.code;
 }
@@ -28,24 +29,28 @@ function flagLabel(flag: PatientSafetyFlag): string {
     data-testid="patient-summary-panel"
   >
     <div class="space-y-2">
-      <p class="eyebrow">Phase 05</p>
-      <h2 class="text-2xl font-semibold tracking-tight text-slate-950">Recent patient summary</h2>
+      <h2 class="text-2xl font-semibold tracking-tight text-slate-950">
+        {{ t('patientSummary.title') }}
+      </h2>
       <p class="max-w-3xl text-sm leading-6 text-slate-600">
-        One review surface for recent questionnaires, adherence, and side effects with explicit
-        safety highlighting.
+        {{ t('patientSummary.subtitle') }}
       </p>
     </div>
 
-    <div v-if="props.isLoading" class="text-sm text-slate-500">Loading patient summary…</div>
+    <div v-if="props.isLoading" class="text-sm text-slate-500">
+      {{ t('patientSummary.loading') }}
+    </div>
 
     <template v-else-if="props.summary">
       <div class="space-y-3" data-testid="patient-summary-safety-flags">
-        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Safety flags</p>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+          {{ t('patientSummary.safetyFlags') }}
+        </p>
         <div
           v-if="props.summary.safety_flags.length === 0"
           class="rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700"
         >
-          No active safety flags from recent history.
+          {{ t('patientSummary.noSafetyFlags') }}
         </div>
         <div v-else class="grid gap-2 sm:grid-cols-2">
           <div
@@ -67,10 +72,10 @@ function flagLabel(flag: PatientSafetyFlag): string {
       <div class="grid gap-4 lg:grid-cols-3">
         <article class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
           <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-            Questionnaires
+            {{ t('patientSummary.questionnaires') }}
           </p>
           <p v-if="props.summary.questionnaires.length === 0" class="mt-2 text-sm text-slate-500">
-            No submissions yet.
+            {{ t('patientSummary.noSubmissionsYet') }}
           </p>
           <ul v-else class="mt-2 space-y-2 text-sm text-slate-700">
             <li
@@ -79,17 +84,22 @@ function flagLabel(flag: PatientSafetyFlag): string {
               class="rounded-xl bg-white px-3 py-2"
             >
               <p class="font-medium text-slate-900">
-                {{ item.questionnaire_code }} · score {{ item.total_score }}
+                {{ item.questionnaire_code }} · {{ t('common.score').toLowerCase() }}
+                {{ item.total_score }}
               </p>
-              <p v-if="item.has_safety_signal" class="text-rose-600">Safety signal</p>
+              <p v-if="item.has_safety_signal" class="text-rose-600">
+                {{ t('patientSummary.safetySignal') }}
+              </p>
             </li>
           </ul>
         </article>
 
         <article class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Adherence</p>
+          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+            {{ t('patientSummary.adherence') }}
+          </p>
           <p v-if="props.summary.adherence.length === 0" class="mt-2 text-sm text-slate-500">
-            No adherence logs yet.
+            {{ t('patientSummary.noAdherenceLogs') }}
           </p>
           <ul v-else class="mt-2 space-y-2 text-sm text-slate-700">
             <li
@@ -98,17 +108,19 @@ function flagLabel(flag: PatientSafetyFlag): string {
               class="rounded-xl bg-white px-3 py-2"
             >
               <p class="font-medium capitalize text-slate-900">{{ item.status }}</p>
-              <p class="text-xs text-slate-500">Medication: {{ item.medication_id }}</p>
+              <p class="text-xs text-slate-500">
+                {{ t('common.medication') }}: {{ item.medication_id }}
+              </p>
             </li>
           </ul>
         </article>
 
         <article class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
           <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-            Side effects
+            {{ t('patientSummary.sideEffects') }}
           </p>
           <p v-if="props.sideEffectsHistory.length === 0" class="mt-2 text-sm text-slate-500">
-            No side effects reported.
+            {{ t('patientSummary.noSideEffects') }}
           </p>
           <ul v-else class="mt-2 space-y-2 text-sm text-slate-700">
             <li

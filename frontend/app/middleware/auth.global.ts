@@ -1,44 +1,49 @@
-import { defineNuxtRouteMiddleware, navigateTo } from '#imports';
+import { defineNuxtRouteMiddleware, navigateTo, useLocalePath } from '#imports';
 import { useAuthStore } from '@features/auth/model/auth-store';
 
 export default defineNuxtRouteMiddleware(async (to) => {
   const authStore = useAuthStore();
+  const localePath = useLocalePath();
+  const loginPath = localePath('/login');
+  const dashboardPath = localePath('/dashboard');
+  const setupAccountPath = localePath('/setup-account');
+
   authStore.loadFromStorage();
 
-  if (to.path === '/login') {
+  if (to.path === loginPath) {
     if (authStore.isAuthenticated) {
       const user = authStore.user ?? (await authStore.fetchMe());
       if (user) {
         if (authStore.requiresAccountSetup) {
-          return navigateTo('/setup-account');
+          return navigateTo(setupAccountPath);
         }
-        return navigateTo('/dashboard');
+        return navigateTo(dashboardPath);
       }
     }
     return;
   }
 
   if (!authStore.isAuthenticated) {
-    return navigateTo('/login');
+    return navigateTo(loginPath);
   }
 
   if (!authStore.user) {
     const user = await authStore.fetchMe();
     if (!user) {
-      return navigateTo('/login');
+      return navigateTo(loginPath);
     }
   }
 
-  if (authStore.requiresAccountSetup && to.path !== '/setup-account') {
-    return navigateTo('/setup-account');
+  if (authStore.requiresAccountSetup && to.path !== setupAccountPath) {
+    return navigateTo(setupAccountPath);
   }
 
-  if (to.path === '/setup-account') {
+  if (to.path === setupAccountPath) {
     if (authStore.user?.role !== 'patient') {
-      return navigateTo('/dashboard');
+      return navigateTo(dashboardPath);
     }
     if (!authStore.requiresAccountSetup) {
-      return navigateTo('/dashboard');
+      return navigateTo(dashboardPath);
     }
   }
 });

@@ -16,6 +16,8 @@ const medicationStore = useMedicationStore();
 const adherenceStore = useAdherenceStore();
 const questionnaireStore = useQuestionnaireStore();
 const sideEffectsStore = useSideEffectsStore();
+const { t } = useI18n();
+const localePath = useLocalePath();
 const isDoctor = computed(() => authStore.user?.role === 'doctor');
 const isPatient = computed(() => authStore.user?.role === 'patient');
 const pageError = ref<string | null>(null);
@@ -31,7 +33,7 @@ async function loadPatientData() {
       questionnaireStore.loadPendingQuestionnaires(),
     ]);
   } catch (err: unknown) {
-    pageError.value = err instanceof Error ? err.message : 'Unable to load patient dashboard data.';
+    pageError.value = err instanceof Error ? err.message : t('dashboard.errors.loadData');
   }
 }
 
@@ -44,7 +46,7 @@ async function handleSubmitAdherence(payload: {
   try {
     await adherenceStore.submitLog(payload);
   } catch (err: unknown) {
-    pageError.value = err instanceof Error ? err.message : 'Unable to save adherence.';
+    pageError.value = err instanceof Error ? err.message : t('dashboard.errors.saveAdherence');
   }
 }
 
@@ -58,7 +60,7 @@ async function handleSubmitSideEffect(payload: {
   try {
     await sideEffectsStore.submitReport(payload);
   } catch (err: unknown) {
-    pageError.value = err instanceof Error ? err.message : 'Unable to report side effect.';
+    pageError.value = err instanceof Error ? err.message : t('dashboard.errors.reportSideEffect');
   }
 }
 
@@ -74,11 +76,11 @@ onMounted(async () => {
 <template>
   <div class="space-y-6">
     <div class="space-y-2">
-      <p class="eyebrow">Phase 03</p>
-      <h1 class="text-3xl font-semibold tracking-tight text-slate-950">Dashboard</h1>
+      <h1 class="text-3xl font-semibold tracking-tight text-slate-950">
+        {{ t('dashboard.title') }}
+      </h1>
       <p class="max-w-2xl text-sm leading-6 text-slate-600">
-        Medication tracking extends the authenticated shell with a shared record: doctors assign
-        active medications, and patients log whether each medication was actually taken.
+        {{ t('dashboard.subtitle') }}
       </p>
     </div>
 
@@ -90,19 +92,21 @@ onMounted(async () => {
       <template #header>
         <div class="flex items-center justify-between gap-4">
           <div>
-            <h3 class="text-lg font-semibold text-slate-950">Current session</h3>
-            <p class="text-sm text-slate-500">Server-validated identity from `/auth/me`</p>
+            <h3 class="text-lg font-semibold text-slate-950">
+              {{ t('dashboard.currentSession') }}
+            </h3>
+            <p class="text-sm text-slate-500">{{ t('dashboard.serverValidatedIdentity') }}</p>
           </div>
           <div class="flex items-center gap-3">
             <UBadge color="primary" variant="subtle">
               {{ authStore.user?.role ?? 'unknown' }}
             </UBadge>
             <NuxtLink
-              to="/logout"
+              :to="localePath('/logout')"
               data-testid="logout-button"
               class="inline-flex items-center justify-center rounded-md bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-200"
             >
-              Log out
+              {{ t('common.logout') }}
             </NuxtLink>
           </div>
         </div>
@@ -110,19 +114,19 @@ onMounted(async () => {
 
       <div class="grid gap-4 md:grid-cols-3">
         <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-          <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Email</p>
+          <p class="text-xs uppercase tracking-[0.18em] text-slate-500">{{ t('common.email') }}</p>
           <p class="mt-2 text-sm font-medium text-slate-900">{{ authStore.user?.email }}</p>
         </div>
         <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-          <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Role</p>
+          <p class="text-xs uppercase tracking-[0.18em] text-slate-500">{{ t('common.role') }}</p>
           <p class="mt-2 text-sm font-medium capitalize text-slate-900">
             {{ authStore.user?.role }}
           </p>
         </div>
         <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-          <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Status</p>
+          <p class="text-xs uppercase tracking-[0.18em] text-slate-500">{{ t('common.status') }}</p>
           <p class="mt-2 text-sm font-medium text-emerald-700">
-            {{ authStore.user?.is_active ? 'Active' : 'Inactive' }}
+            {{ authStore.user?.is_active ? t('common.active') : t('common.inactive') }}
           </p>
         </div>
       </div>
@@ -135,24 +139,23 @@ onMounted(async () => {
     >
       <template #header>
         <div>
-          <h3 class="text-lg font-semibold text-slate-950">Doctor workflow</h3>
+          <h3 class="text-lg font-semibold text-slate-950">{{ t('dashboard.doctorWorkflow') }}</h3>
           <p class="text-sm text-slate-500">
-            Open the roster to manage patient access, assign medications, and review adherence.
+            {{ t('dashboard.doctorWorkflowDescription') }}
           </p>
         </div>
       </template>
 
       <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <p class="max-w-2xl text-sm leading-6 text-slate-600">
-          The roster now acts as the doctor workspace for onboarding, medication assignment, and
-          recent adherence review.
+          {{ t('dashboard.doctorWorkspaceSummary') }}
         </p>
         <NuxtLink
-          to="/patients"
+          :to="localePath('/patients')"
           class="inline-flex items-center justify-center rounded-2xl bg-slate-950 px-4 py-3 text-sm font-medium text-white transition hover:bg-slate-800"
           data-testid="open-patients-link"
         >
-          Open patient roster
+          {{ t('dashboard.openPatientRoster') }}
         </NuxtLink>
       </div>
     </UCard>
@@ -164,8 +167,8 @@ onMounted(async () => {
     >
       <template #header>
         <div>
-          <h3 class="text-lg font-semibold text-slate-950">Patient access</h3>
-          <p class="text-sm text-slate-500">Your account is linked to one doctor for MVP.</p>
+          <h3 class="text-lg font-semibold text-slate-950">{{ t('dashboard.patientAccess') }}</h3>
+          <p class="text-sm text-slate-500">{{ t('dashboard.patientAccessDescription') }}</p>
         </div>
       </template>
 
@@ -173,16 +176,16 @@ onMounted(async () => {
         <p class="text-sm leading-6 text-slate-600">
           {{
             authStore.requiresAccountSetup
-              ? 'Your first-login setup is still pending. Finish it before accessing the rest of the app.'
-              : 'Your onboarding is complete. Your current medication list is shown below, and you can log adherence directly from this dashboard.'
+              ? t('dashboard.requiresSetup')
+              : t('dashboard.onboardingComplete')
           }}
         </p>
         <NuxtLink
           v-if="authStore.requiresAccountSetup"
-          to="/setup-account"
+          :to="localePath('/setup-account')"
           class="inline-flex items-center justify-center rounded-2xl bg-slate-950 px-4 py-3 text-sm font-medium text-white transition hover:bg-slate-800"
         >
-          Finish account setup
+          {{ t('dashboard.finishAccountSetup') }}
         </NuxtLink>
       </div>
     </UCard>
@@ -196,7 +199,7 @@ onMounted(async () => {
       <PatientMedicationList
         :items="medicationStore.patientItems"
         :is-loading="medicationStore.isLoadingPatientItems"
-        empty-message="No active medications have been assigned yet."
+        :empty-message="t('dashboard.noActiveMedications')"
       />
 
       <AdherenceLogForm

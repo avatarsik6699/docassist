@@ -12,6 +12,7 @@ const emit = defineEmits<{
 }>();
 
 const questionnaireCode = ref<QuestionnaireCode>('PHQ-9');
+const { t } = useI18n();
 
 function handleSubmit() {
   emit('submit', { questionnaireCode: questionnaireCode.value });
@@ -21,11 +22,12 @@ function handleSubmit() {
 <template>
   <section class="space-y-4">
     <div class="space-y-2">
-      <p class="eyebrow">Questionnaire assignment</p>
-      <h2 class="text-2xl font-semibold tracking-tight text-slate-950">Assign PHQ-9 or GAD-7</h2>
+      <p class="eyebrow">{{ t('doctorQuestionnaireForm.eyebrow') }}</p>
+      <h2 class="text-2xl font-semibold tracking-tight text-slate-950">
+        {{ t('doctorQuestionnaireForm.title') }}
+      </h2>
       <p class="max-w-2xl text-sm leading-6 text-slate-600">
-        Create a pending questionnaire for the selected patient so they can complete it from their
-        dashboard.
+        {{ t('doctorQuestionnaireForm.subtitle') }}
       </p>
     </div>
 
@@ -34,13 +36,16 @@ function handleSubmit() {
       @submit.prevent="handleSubmit"
     >
       <p v-if="props.patientEmail" class="text-sm text-slate-600">
-        Assigning for: <span class="font-medium text-slate-900">{{ props.patientEmail }}</span>
+        {{ t('doctorQuestionnaireForm.assigningFor') }}:
+        <span class="font-medium text-slate-900">{{ props.patientEmail }}</span>
       </p>
-      <p v-else class="text-sm text-slate-500">Select a patient first.</p>
+      <p v-else class="text-sm text-slate-500">
+        {{ t('doctorQuestionnaireForm.selectPatientFirst') }}
+      </p>
 
-      <label for="questionnaire-code" class="text-sm font-medium text-slate-700"
-        >Questionnaire</label
-      >
+      <label for="questionnaire-code" class="text-sm font-medium text-slate-700">{{
+        t('common.questionnaire')
+      }}</label>
       <select
         id="questionnaire-code"
         v-model="questionnaireCode"
@@ -63,7 +68,11 @@ function handleSubmit() {
           data-testid="assign-questionnaire-submit"
           :disabled="props.isSubmitting || !props.patientEmail"
         >
-          {{ props.isSubmitting ? 'Assigning…' : 'Assign questionnaire' }}
+          {{
+            props.isSubmitting
+              ? t('doctorQuestionnaireForm.assigning')
+              : t('doctorQuestionnaireForm.assignQuestionnaire')
+          }}
         </button>
       </div>
     </form>

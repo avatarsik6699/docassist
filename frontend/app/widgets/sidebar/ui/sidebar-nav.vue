@@ -2,10 +2,68 @@
 import { useAuthStore } from '@features/auth/model/auth-store';
 
 const authStore = useAuthStore();
+const route = useRoute();
 const { locale, locales, setLocale, t } = useI18n();
+const localePath = useLocalePath();
 const colorMode = useColorMode();
 
-const availableLocales = locales.value.map((item) => item.code);
+const mobileMenuOpen = ref(false);
+
+const localeItems = computed(() =>
+  locales.value.map((item) => {
+    const code = String(item.code);
+    return {
+      label: item.name ?? code.toUpperCase(),
+      value: code,
+    };
+  })
+);
+
+const userRoleLabel = computed(() => {
+  if (authStore.user?.role === 'doctor') {
+    return t('common.roles.doctor');
+  }
+  if (authStore.user?.role === 'patient') {
+    return t('common.roles.patient');
+  }
+  if (authStore.user?.role === 'admin') {
+    return t('common.roles.admin');
+  }
+  return t('common.unknown');
+});
+
+const isDark = computed(() => colorMode.value === 'dark');
+
+const navigationItems = computed(() => {
+  const items: { key: string; to: string; show: boolean }[] = [
+    { key: 'nav.dashboard', to: localePath('/dashboard'), show: true },
+    { key: 'nav.patients', to: localePath('/patients'), show: authStore.user?.role === 'doctor' },
+    {
+      key: 'nav.setupAccount',
+      to: localePath('/setup-account'),
+      show: Boolean(authStore.requiresAccountSetup),
+    },
+  ];
+
+  return items.filter((item) => item.show);
+});
+
+function toggleTheme() {
+  colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark';
+}
+
+function handleLocaleChange(value: string) {
+  if (value === 'en' || value === 'ru') {
+    setLocale(value);
+  }
+}
+
+watch(
+  () => route.fullPath,
+  () => {
+    mobileMenuOpen.value = false;
+  }
+);
 
 onMounted(() => {
   authStore.loadFromStorage();
@@ -13,89 +71,153 @@ onMounted(() => {
     authStore.fetchMe();
   }
 });
-
-const isDark = computed({
-  get() {
-    return colorMode.value === 'dark';
-  },
-  set() {
-    colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark';
-  },
-});
 </script>
 
 <template>
-  <aside
-    class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col p-4 shrink-0"
-  >
-    <div
-      class="text-lg font-bold text-primary-600 dark:text-primary-400 mb-6 flex items-center justify-between"
+  <header class="app-mobile-topbar flex lg:hidden">
+    <button
+      type="button"
+      class="app-icon-btn"
+      :aria-label="t('nav.openMenu')"
+      @click="mobileMenuOpen = true"
     >
-      <span>Docassist</span>
-      <UButton
-        :icon="isDark ? 'i-heroicons-moon-20-solid' : 'i-heroicons-sun-20-solid'"
-        color="neutral"
-        variant="ghost"
-        aria-label="Theme"
-        @click="isDark = !isDark"
-      />
+      <UIcon name="i-heroicons-bars-3" />
+    </button>
+
+    <div class="app-brand-wrap">
+      <span class="app-brand-mark">D</span>
+      <span class="app-brand-name">Docassist</span>
     </div>
 
-    <!-- Navigation -->
-    <nav class="flex flex-col gap-1 flex-1">
+    <button
+      type="button"
+      class="app-icon-btn"
+      :aria-label="t('nav.themeToggle')"
+      @click="toggleTheme"
+    >
+      <UIcon :name="isDark ? 'i-heroicons-sun-20-solid' : 'i-heroicons-moon-20-solid'" />
+    </button>
+  </header>
+
+  <aside class="app-sidebar hidden lg:flex">
+    <div class="app-brand-wrap">
+      <span class="app-brand-mark">D</span>
+      <span class="app-brand-name">Docassist</span>
+    </div>
+
+    <nav class="app-nav-list">
       <NuxtLink
-        to="/dashboard"
-        class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/50 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
-        active-class="bg-primary-50 dark:bg-primary-900 text-primary-700 dark:text-primary-300"
+        v-for="item in navigationItems"
+        :key="item.to"
+        :to="item.to"
+        class="app-nav-link"
+        active-class="app-nav-link-active"
       >
-        {{ t('welcome') }}
-      </NuxtLink>
-      <NuxtLink
-        v-if="authStore.user?.role === 'doctor'"
-        to="/patients"
-        class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/50 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
-        active-class="bg-primary-50 dark:bg-primary-900 text-primary-700 dark:text-primary-300"
-      >
-        {{ t('patients') }}
-      </NuxtLink>
-      <NuxtLink
-        v-if="authStore.requiresAccountSetup"
-        to="/setup-account"
-        class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/50 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
-        active-class="bg-primary-50 dark:bg-primary-900 text-primary-700 dark:text-primary-300"
-      >
-        {{ t('setupAccount') }}
+        {{ t(item.key) }}
       </NuxtLink>
     </nav>
 
-    <!-- Settings / Lang -->
-    <div class="flex flex-col gap-4 mt-auto pt-4 border-t border-gray-100 dark:border-gray-700">
-      <div class="flex items-center gap-2">
-        <UIcon name="i-heroicons-language" class="text-gray-400" />
+    <div class="app-sidebar-footer">
+      <div class="app-sidebar-control-row">
+        <button
+          type="button"
+          class="app-icon-btn"
+          :aria-label="t('nav.themeToggle')"
+          @click="toggleTheme"
+        >
+          <UIcon :name="isDark ? 'i-heroicons-sun-20-solid' : 'i-heroicons-moon-20-solid'" />
+        </button>
+
         <USelect
-          option-attribute="name"
-          size="xs"
-          value-attribute="code"
           :model-value="locale"
-          :items="availableLocales"
-          @update:model-value="setLocale"
+          value-key="value"
+          :items="localeItems"
+          size="xs"
+          class="w-full"
+          @update:model-value="handleLocaleChange"
         />
       </div>
 
-      <!-- User section -->
-      <div v-if="authStore.user" class="mb-2">
-        <p class="text-xs text-gray-500 truncate">{{ authStore.user.email }}</p>
-        <UBadge size="xs" variant="subtle" class="mt-1">
-          {{ authStore.user.role }}
-        </UBadge>
+      <div v-if="authStore.user" class="app-user-card">
+        <p class="app-user-email">{{ authStore.user.email }}</p>
+        <UBadge size="xs" variant="subtle" color="primary">{{ userRoleLabel }}</UBadge>
       </div>
-      <NuxtLink
-        to="/logout"
-        class="flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-rose-600 transition hover:bg-rose-50"
-      >
+
+      <NuxtLink :to="localePath('/logout')" class="app-logout-btn">
         <UIcon name="i-heroicons-arrow-left-on-rectangle" />
-        {{ t('login') }} (Logout)
+        {{ t('common.logout') }}
       </NuxtLink>
     </div>
   </aside>
+
+  <Transition name="drawer-fade">
+    <div
+      v-if="mobileMenuOpen"
+      class="app-mobile-overlay lg:hidden"
+      @click="mobileMenuOpen = false"
+    />
+  </Transition>
+
+  <Transition name="drawer-slide">
+    <aside v-if="mobileMenuOpen" class="app-mobile-drawer flex lg:hidden">
+      <div class="flex items-center justify-between gap-3">
+        <div class="app-brand-wrap">
+          <span class="app-brand-mark">D</span>
+          <span class="app-brand-name">Docassist</span>
+        </div>
+        <button
+          type="button"
+          class="app-icon-btn"
+          :aria-label="t('common.close')"
+          @click="mobileMenuOpen = false"
+        >
+          <UIcon name="i-heroicons-x-mark" />
+        </button>
+      </div>
+
+      <nav class="app-nav-list mt-6">
+        <NuxtLink
+          v-for="item in navigationItems"
+          :key="`mobile-${item.to}`"
+          :to="item.to"
+          class="app-nav-link"
+          active-class="app-nav-link-active"
+        >
+          {{ t(item.key) }}
+        </NuxtLink>
+      </nav>
+
+      <div class="app-sidebar-footer mt-auto">
+        <div class="app-sidebar-control-row">
+          <button
+            type="button"
+            class="app-icon-btn"
+            :aria-label="t('nav.themeToggle')"
+            @click="toggleTheme"
+          >
+            <UIcon :name="isDark ? 'i-heroicons-sun-20-solid' : 'i-heroicons-moon-20-solid'" />
+          </button>
+
+          <USelect
+            :model-value="locale"
+            value-key="value"
+            :items="localeItems"
+            size="xs"
+            class="w-full"
+            @update:model-value="handleLocaleChange"
+          />
+        </div>
+
+        <div v-if="authStore.user" class="app-user-card">
+          <p class="app-user-email">{{ authStore.user.email }}</p>
+          <UBadge size="xs" variant="subtle" color="primary">{{ userRoleLabel }}</UBadge>
+        </div>
+
+        <NuxtLink :to="localePath('/logout')" class="app-logout-btn">
+          <UIcon name="i-heroicons-arrow-left-on-rectangle" />
+          {{ t('common.logout') }}
+        </NuxtLink>
+      </div>
+    </aside>
+  </Transition>
 </template>

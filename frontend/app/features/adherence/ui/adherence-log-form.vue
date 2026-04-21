@@ -14,6 +14,7 @@ const emit = defineEmits<{
     payload: { medicationId: string; status: AdherenceStatus; deviationNote: string | null },
   ];
 }>();
+const { t } = useI18n();
 
 const medicationId = ref('');
 const status = ref<AdherenceStatus>('taken');
@@ -53,10 +54,12 @@ function handleSubmit() {
 <template>
   <section class="space-y-4">
     <div class="space-y-2">
-      <p class="eyebrow">Daily check-in</p>
-      <h2 class="text-2xl font-semibold tracking-tight text-slate-950">Log adherence</h2>
+      <p class="eyebrow">{{ t('adherenceForm.eyebrow') }}</p>
+      <h2 class="text-2xl font-semibold tracking-tight text-slate-950">
+        {{ t('adherenceForm.title') }}
+      </h2>
       <p class="max-w-2xl text-sm leading-6 text-slate-600">
-        Submit whether a medication was taken as planned and add a note only when something changed.
+        {{ t('adherenceForm.subtitle') }}
       </p>
     </div>
 
@@ -64,9 +67,9 @@ function handleSubmit() {
       class="grid gap-3 rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm"
       @submit.prevent="handleSubmit"
     >
-      <label for="adherence-medication" class="text-sm font-medium text-slate-700"
-        >Medication</label
-      >
+      <label for="adherence-medication" class="text-sm font-medium text-slate-700">{{
+        t('common.medication')
+      }}</label>
       <select
         id="adherence-medication"
         v-model="medicationId"
@@ -74,13 +77,15 @@ function handleSubmit() {
         data-testid="adherence-medication-select"
         :disabled="props.isSubmitting || props.medications.length === 0"
       >
-        <option disabled value="">Select medication</option>
+        <option disabled value="">{{ t('adherenceForm.selectMedication') }}</option>
         <option v-for="item in props.medications" :key="item.id" :value="item.id">
           {{ item.name }}
         </option>
       </select>
 
-      <label for="adherence-status" class="text-sm font-medium text-slate-700">Status</label>
+      <label for="adherence-status" class="text-sm font-medium text-slate-700">
+        {{ t('common.status') }}
+      </label>
       <select
         id="adherence-status"
         v-model="status"
@@ -88,19 +93,19 @@ function handleSubmit() {
         data-testid="adherence-status-select"
         :disabled="props.isSubmitting || props.medications.length === 0"
       >
-        <option value="taken">Taken</option>
-        <option value="missed">Missed</option>
-        <option value="modified">Modified</option>
+        <option value="taken">{{ t('statuses.adherence.taken') }}</option>
+        <option value="missed">{{ t('statuses.adherence.missed') }}</option>
+        <option value="modified">{{ t('statuses.adherence.modified') }}</option>
       </select>
 
       <label for="adherence-note" class="text-sm font-medium text-slate-700">
-        Deviation note
+        {{ t('adherenceForm.deviationNote') }}
       </label>
       <textarea
         id="adherence-note"
         v-model="deviationNote"
         class="field-input min-h-24"
-        placeholder="Optional context if the dose was missed or changed"
+        :placeholder="t('adherenceForm.notePlaceholder')"
         data-testid="adherence-note-input"
         :disabled="props.isSubmitting || props.medications.length === 0"
       />
@@ -123,7 +128,7 @@ function handleSubmit() {
           data-testid="adherence-submit"
           :disabled="props.isSubmitting || props.medications.length === 0 || !medicationId"
         >
-          {{ props.isSubmitting ? 'Saving…' : 'Save adherence' }}
+          {{ props.isSubmitting ? t('common.saving') : t('adherenceForm.saveAdherence') }}
         </button>
       </div>
     </form>

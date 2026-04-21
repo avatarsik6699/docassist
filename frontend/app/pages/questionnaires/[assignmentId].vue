@@ -7,6 +7,8 @@ definePageMeta({ layout: 'default' });
 const route = useRoute();
 const questionnaireStore = useQuestionnaireStore();
 const authStore = useAuthStore();
+const { t } = useI18n();
+const localePath = useLocalePath();
 
 const assignmentId = computed(() => String(route.params.assignmentId ?? ''));
 const assignment = computed(() =>
@@ -18,10 +20,10 @@ async function loadPending() {
   try {
     await questionnaireStore.loadPendingQuestionnaires();
     if (!assignment.value) {
-      pageError.value = 'Questionnaire assignment is not available.';
+      pageError.value = t('questionnairePage.errors.assignmentUnavailable');
     }
   } catch (err: unknown) {
-    pageError.value = err instanceof Error ? err.message : 'Unable to load questionnaire.';
+    pageError.value = err instanceof Error ? err.message : t('questionnairePage.errors.loadFailed');
   }
 }
 
@@ -29,9 +31,10 @@ async function handleSubmit(answers: Record<string, number>) {
   pageError.value = null;
   try {
     await questionnaireStore.submitQuestionnaire(assignmentId.value, answers);
-    await navigateTo('/dashboard');
+    await navigateTo(localePath('/dashboard'));
   } catch (err: unknown) {
-    pageError.value = err instanceof Error ? err.message : 'Unable to submit questionnaire.';
+    pageError.value =
+      err instanceof Error ? err.message : t('questionnairePage.errors.submitFailed');
   }
 }
 
@@ -46,10 +49,12 @@ onMounted(async () => {
 <template>
   <div class="space-y-6">
     <div class="space-y-2">
-      <p class="eyebrow">Questionnaire submission</p>
-      <h1 class="text-3xl font-semibold tracking-tight text-slate-950">Complete questionnaire</h1>
+      <p class="eyebrow">{{ t('questionnairePage.eyebrow') }}</p>
+      <h1 class="text-3xl font-semibold tracking-tight text-slate-950">
+        {{ t('questionnairePage.title') }}
+      </h1>
       <p class="max-w-2xl text-sm leading-6 text-slate-600">
-        Answer each item using a score from 0 to 3, then submit the form once.
+        {{ t('questionnairePage.subtitle') }}
       </p>
     </div>
 
@@ -66,10 +71,10 @@ onMounted(async () => {
     />
 
     <NuxtLink
-      to="/dashboard"
+      :to="localePath('/dashboard')"
       class="inline-flex items-center justify-center rounded-xl bg-slate-200 px-4 py-2 text-sm font-medium text-slate-800 transition hover:bg-slate-300"
     >
-      Back to dashboard
+      {{ t('questionnairePage.backToDashboard') }}
     </NuxtLink>
   </div>
 </template>
