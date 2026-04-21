@@ -1,6 +1,8 @@
 {
   "welcome": "Welcome to Nuxt 4",
   "login": "Login",
+  "patients": "Patients",
+  "setupAccount": "Setup account",
   "theme": {
     "system": "System",
     "light": "Light",

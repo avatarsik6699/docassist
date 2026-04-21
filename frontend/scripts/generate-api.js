@@ -9,7 +9,7 @@ const PASSWORD = process.env.API_PASSWORD;
 const SCHEMA_PATH = 'schema.json';
 // FastAPI serves openapi.json at the root by default
 const OPENAPI_ENDPOINT = '/openapi.json';
-const OUTPUT_TYPES_PATH = 'app/types/schema.ts';
+const OUTPUT_TYPES_PATH = 'app/shared/types/schema.ts';
 
 // Функция для санитизации сообщений логов
 const sanitizeLogMessage = (message) => {
@@ -71,7 +71,7 @@ const generateTypes = () => {
 
   try {
     execSync(
-      `npx openapi-typescript ${SCHEMA_PATH} -o ${OUTPUT_TYPES_PATH} && eslint ${OUTPUT_TYPES_PATH} --fix`,
+      `npx openapi-typescript ${SCHEMA_PATH} -o ${OUTPUT_TYPES_PATH} && pnpm exec eslint ${OUTPUT_TYPES_PATH} --fix`,
       { stdio: 'inherit' }
     );
     log('✓ Types generated successfully');

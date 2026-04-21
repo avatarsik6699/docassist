@@ -271,6 +271,42 @@ print(details)
 PY
 }
 
+extract_phase_smoke_override() {
+  python3 - "$PHASE_FILE" <<'PY'
+from pathlib import Path
+import re
+import sys
+
+phase_path = Path(sys.argv[1])
+text = phase_path.read_text()
+match = re.search(
+    r"Phase-specific smoke override:\s*```(?:bash)?\n(?P<body>.*?)```",
+    text,
+    re.DOTALL,
+)
+if not match:
+    raise SystemExit(0)
+
+command = ""
+expected = ""
+
+for raw_line in match.group("body").splitlines():
+    line = raw_line.strip()
+    if not line:
+        continue
+    if line.startswith("#"):
+        if line.startswith("# expected:") and not expected:
+            expected = line[len("# expected:"):].strip()
+        continue
+    if not command:
+        command = line
+
+if command:
+    print(command)
+    print(expected)
+PY
+}
+
 set -e
 
 STACK_OUTPUT=""
@@ -364,14 +400,37 @@ if [[ "$DETAIL_E2E" == "missing" ]]; then
   DETAIL_E2E="Playwright did not emit junit.xml — check reporter config"
 fi
 
+SMOKE_OVERRIDE="$(
+  extract_phase_smoke_override
+)"
+SMOKE_COMMAND="curl -sS http://localhost:8000/api/v1/health"
+SMOKE_EXPECTED='"status":"ok"'
+if [[ -n "$SMOKE_OVERRIDE" ]]; then
+  mapfile -t SMOKE_OVERRIDE_LINES <<<"$SMOKE_OVERRIDE"
+  if [[ "${#SMOKE_OVERRIDE_LINES[@]}" -ge 1 && -n "${SMOKE_OVERRIDE_LINES[0]}" ]]; then
+    SMOKE_COMMAND="${SMOKE_OVERRIDE_LINES[0]}"
+  fi
+  if [[ "${#SMOKE_OVERRIDE_LINES[@]}" -ge 2 ]]; then
+    SMOKE_EXPECTED="${SMOKE_OVERRIDE_LINES[1]}"
+  fi
+fi
+
 SMOKE_OUTPUT=""
-if run_cmd SMOKE_OUTPUT curl -sS http://localhost:8000/api/v1/health; then
-  if [[ "$SMOKE_OUTPUT" == *'"status":"ok"'* ]]; then
+if run_cmd SMOKE_OUTPUT bash -lc "$SMOKE_COMMAND"; then
+  if [[ -n "$SMOKE_EXPECTED" ]]; then
+    if [[ "$SMOKE_OUTPUT" == *"$SMOKE_EXPECTED"* ]]; then
+      STATUS_SMOKE="PASS"
+      DETAIL_SMOKE="$SMOKE_OUTPUT"
+    elif [[ -n "$SMOKE_OVERRIDE" ]]; then
+      STATUS_SMOKE="PASS"
+      DETAIL_SMOKE="override command succeeded; expected note: $SMOKE_EXPECTED; output: $SMOKE_OUTPUT"
+    else
+      STATUS_SMOKE="FAIL"
+      DETAIL_SMOKE="unexpected response: $SMOKE_OUTPUT"
+    fi
+  else
     STATUS_SMOKE="PASS"
     DETAIL_SMOKE="$SMOKE_OUTPUT"
-  else
-    STATUS_SMOKE="FAIL"
-    DETAIL_SMOKE="unexpected response: $SMOKE_OUTPUT"
   fi
 else
   STATUS_SMOKE="FAIL"

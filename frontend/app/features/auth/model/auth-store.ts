@@ -1,35 +1,48 @@
 import { computed, ref } from 'vue';
-import { navigateTo, useNuxtApp } from '#imports';
+import { navigateTo, refreshCookie, useNuxtApp, useCookie } from '#imports';
 import { defineStore } from 'pinia';
-import { safeCookie } from '@shared/lib/safe-cookie';
 
 export const AUTH_COOKIE_CONFIG = {
   key: 'docassist_token',
   version: '1.0',
 };
 
+type TokenCookieValue = { version: string; data: string } | null;
+
 export interface AuthUser {
   id: string;
   email: string;
   role: 'admin' | 'doctor' | 'patient';
   is_active: boolean;
+  onboarding_status?: 'pending' | 'completed' | null;
+  must_change_password?: boolean | null;
+  doctor_user_id?: string | null;
 }
 
-const readTokenFromCookie = () =>
-  safeCookie.getItem<string>({
-    keyWithVersion: AUTH_COOKIE_CONFIG,
+export const useAuthStore = defineStore('auth', () => {
+  const tokenCookie = useCookie<TokenCookieValue>(AUTH_COOKIE_CONFIG.key, {
+    maxAge: 60 * 60,
+    path: '/',
+    sameSite: 'lax',
   });
 
-export const useAuthStore = defineStore('auth', () => {
   const user = ref<AuthUser | null>(null);
   const token = ref<string | null>(null);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
   const isAuthenticated = computed(() => !!token.value);
+  const requiresAccountSetup = computed(
+    () => user.value?.role === 'patient' && Boolean(user.value.must_change_password)
+  );
 
   function loadFromStorage(): string | undefined {
-    token.value = readTokenFromCookie() ?? null;
+    const raw = tokenCookie.value;
+    if (raw?.version === AUTH_COOKIE_CONFIG.version) {
+      token.value = raw.data;
+    } else if (!token.value) {
+      token.value = null;
+    }
     return token.value ?? undefined;
   }
 
@@ -46,15 +59,8 @@ export const useAuthStore = defineStore('auth', () => {
         },
       });
 
-      safeCookie.setItem({
-        keyWithVersion: AUTH_COOKIE_CONFIG,
-        value: data.access_token,
-        options: {
-          maxAge: 60 * 60,
-          path: '/',
-          sameSite: 'lax',
-        },
-      });
+      tokenCookie.value = { version: AUTH_COOKIE_CONFIG.version, data: data.access_token };
+      refreshCookie(AUTH_COOKIE_CONFIG.key);
 
       token.value = data.access_token;
       await fetchMe(data.access_token);
@@ -107,11 +113,25 @@ export const useAuthStore = defineStore('auth', () => {
     token.value = null;
     user.value = null;
     error.value = null;
-    safeCookie.removeItem({ keyWithVersion: AUTH_COOKIE_CONFIG });
+    tokenCookie.value = null;
+    refreshCookie(AUTH_COOKIE_CONFIG.key);
 
     if (redirect) {
       await navigateTo('/login');
     }
+  }
+
+  async function setupAccount(newPassword: string): Promise<AuthUser> {
+    const { $api } = useNuxtApp();
+    const updatedUser = await $api<AuthUser>('/api/v1/patients/setup-account', {
+      method: 'POST',
+      body: {
+        new_password: newPassword,
+      },
+    });
+
+    user.value = updatedUser;
+    return updatedUser;
   }
 
   return {
@@ -120,9 +140,11 @@ export const useAuthStore = defineStore('auth', () => {
     error,
     token,
     isAuthenticated,
+    requiresAccountSetup,
     loadFromStorage,
     login,
     fetchMe,
     logout,
+    setupAccount,
   };
 });

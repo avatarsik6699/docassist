@@ -72,10 +72,104 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/patients': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Patients */
+    get: operations['list_patients_api_v1_patients_get'];
+    put?: never;
+    /** Create Patient */
+    post: operations['create_patient_api_v1_patients_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/patients/{patient_id}/activate': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Activate Patient */
+    post: operations['activate_patient_api_v1_patients__patient_id__activate_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/patients/setup-account': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Setup Account */
+    post: operations['setup_account_api_v1_patients_setup_account_post'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
+    /** ActivatePatientResponse */
+    ActivatePatientResponse: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Is Active */
+      is_active: boolean;
+      /**
+       * Onboarding Status
+       * @enum {string}
+       */
+      onboarding_status: 'pending' | 'completed';
+    };
+    /** CreatePatientRequest */
+    CreatePatientRequest: {
+      /** Email */
+      email: string;
+    };
+    /** CreatePatientResponse */
+    CreatePatientResponse: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Email */
+      email: string;
+      /**
+       * Doctor User Id
+       * Format: uuid
+       */
+      doctor_user_id: string;
+      /**
+       * Onboarding Status
+       * @constant
+       */
+      onboarding_status: 'pending';
+      /** Temporary Password */
+      temporary_password: string;
+    };
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
@@ -87,6 +181,41 @@ export interface components {
       email: string;
       /** Password */
       password: string;
+    };
+    /** LogoutResponse */
+    LogoutResponse: {
+      /**
+       * Message
+       * @default logged out
+       */
+      message: string;
+    };
+    /** PatientRosterItem */
+    PatientRosterItem: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Email */
+      email: string;
+      /** Is Active */
+      is_active: boolean;
+      /**
+       * Onboarding Status
+       * @enum {string}
+       */
+      onboarding_status: 'pending' | 'completed';
+    };
+    /** PatientRosterResponse */
+    PatientRosterResponse: {
+      /** Items */
+      items: components['schemas']['PatientRosterItem'][];
+    };
+    /** SetupAccountRequest */
+    SetupAccountRequest: {
+      /** New Password */
+      new_password: string;
     };
     /** TokenResponse */
     TokenResponse: {
@@ -111,6 +240,12 @@ export interface components {
       role: string;
       /** Is Active */
       is_active: boolean;
+      /** Onboarding Status */
+      onboarding_status?: ('pending' | 'completed') | null;
+      /** Must Change Password */
+      must_change_password?: boolean | null;
+      /** Doctor User Id */
+      doctor_user_id?: string | null;
     };
     /** ValidationError */
     ValidationError: {
@@ -224,9 +359,124 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': {
-            [key: string]: unknown;
-          };
+          'application/json': components['schemas']['LogoutResponse'];
+        };
+      };
+    };
+  };
+  list_patients_api_v1_patients_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PatientRosterResponse'];
+        };
+      };
+    };
+  };
+  create_patient_api_v1_patients_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreatePatientRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CreatePatientResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  activate_patient_api_v1_patients__patient_id__activate_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        patient_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ActivatePatientResponse'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
+        };
+      };
+    };
+  };
+  setup_account_api_v1_patients_setup_account_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SetupAccountRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['UserOut'];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HTTPValidationError'];
         };
       };
     };

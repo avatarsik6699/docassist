@@ -1,20 +1,23 @@
-import { defineNuxtPlugin, useRuntimeConfig, navigateTo } from '#imports';
-import { safeCookie } from '@shared/lib/safe-cookie';
+import { defineNuxtPlugin, useRuntimeConfig, navigateTo, useCookie } from '#imports';
 import { AUTH_COOKIE_CONFIG } from '@features/auth/model/auth-store';
 
 export default defineNuxtPlugin(() => {
   const config = useRuntimeConfig();
-  const configuredApiBase = ((config.public.apiBase as string) || 'http://localhost:8000/api/v1')
+  const rawApiBase = (import.meta.server ? config.apiBaseInternal : config.public.apiBase) as
+    | string
+    | undefined;
+  const configuredApiBase = (rawApiBase || 'http://localhost:8000/api/v1')
     .replace(/\/$/, '')
     .replace(/\/api\/v1$/, '');
+
+  const tokenCookie = useCookie<{ version: string; data: string } | null>(AUTH_COOKIE_CONFIG.key);
 
   const api = $fetch.create({
     baseURL: configuredApiBase,
 
     onRequest({ options }) {
-      const token = safeCookie.getItem<string>({
-        keyWithVersion: AUTH_COOKIE_CONFIG,
-      });
+      const raw = tokenCookie.value;
+      const token = raw?.version === AUTH_COOKIE_CONFIG.version ? raw.data : null;
 
       if (token) {
         options.headers = options.headers || {};
@@ -32,7 +35,7 @@ export default defineNuxtPlugin(() => {
 
     onResponseError({ response }) {
       if (response.status === 401) {
-        safeCookie.removeItem({ keyWithVersion: AUTH_COOKIE_CONFIG });
+        tokenCookie.value = null;
 
         if (import.meta.client) {
           navigateTo('/login');

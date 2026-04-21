@@ -27,6 +27,7 @@ if TEST_DATABASE_URL.startswith("sqlite"):
 os.environ.setdefault("DATABASE_URL", TEST_DATABASE_URL)
 os.environ.setdefault("SECRET_KEY", "test-secret-key-for-ci-only")
 
+import app.db.models  # noqa: F401, E402
 from app.db.base import Base  # noqa: E402
 from app.db.session import get_db  # noqa: E402
 from app.main import app  # noqa: E402

@@ -1,4 +1,6 @@
 import enum
+import secrets
+import string
 from datetime import UTC, datetime, timedelta
 from typing import Annotated
 from uuid import UUID
@@ -11,6 +13,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
+from app.db.models.patient_profile import PatientProfile
 from app.db.models.user import User, UserRole
 from app.db.session import get_db
 
@@ -29,6 +32,11 @@ def hash_password(plain: str) -> str:
 
 def verify_password(plain: str, hashed: str) -> bool:
     return bcrypt.checkpw(plain.encode(), hashed.encode())
+
+
+def generate_temporary_password(length: int = 12) -> str:
+    alphabet = string.ascii_letters + string.digits
+    return "".join(secrets.choice(alphabet) for _ in range(length))
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
@@ -88,6 +96,22 @@ async def get_current_user(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Account is disabled",
         )
+
+    if user.role == UserRole.patient:
+        patient_result = await db.execute(
+            select(PatientProfile).where(PatientProfile.user_id == user.id)
+        )
+        patient_profile = patient_result.scalar_one_or_none()
+        if patient_profile is None:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Patient profile is missing",
+            )
+        if not patient_profile.is_active_with_doctor:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Account is disabled",
+            )
 
     return user
 

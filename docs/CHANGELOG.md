@@ -6,6 +6,29 @@
 
 ---
 
+## v1.3 — 2026-04-21 — Phase 02 Contract Synced
+
+**Type**: phase-completion
+**Author**: Codex (`/context-update`)
+**Triggered by**: Phase 02 implementation landed and the doctor-patient onboarding contract became active
+
+### Changes
+- Added the doctor-patient relationship contract to the shared repository memory
+- Recorded the active patient roster API surface for doctor-managed create, list, activate, and patient setup-account flows
+- Captured the new authenticated UI surface for doctor roster management and patient first-login onboarding
+- Advanced the schema snapshot to Alembic head `0002_doctor_patient_profiles`
+
+### Affected Phases
+- PHASE_02 — implementation synchronized into the shared contract snapshot after a passing gate and manual verification
+
+### Contract Updates
+- `CONTEXT.md` bumped from `v1.2` to `v1.3`
+- Added `DoctorProfile` and `PatientProfile` to the active core model snapshot
+- Appended the `/api/v1/patients` and `/api/v1/patients/setup-account` endpoints plus the `/patients` and `/setup-account` frontend routes
+
+### Notes
+This is an additive bump because Phase 02 extends the active contract without replacing the Phase 01 surface. The phase gate is green, though the current phase-specific smoke command still only checks that the roster endpoint responds rather than asserting a doctor-authenticated payload.
+
 ## v1.2 — 2026-04-20 — Phase 01 Contract Synced
 
 **Type**: breaking-change

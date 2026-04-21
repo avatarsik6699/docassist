@@ -8,10 +8,10 @@
 |-------|-------|
 | Phase | `02` |
 | Title | Doctor-patient relationship and patient account onboarding |
-| Status | `⏳ pending` |
+| Status | `✅ done` |
 | Tag | `v0.2.0` |
 | Depends on | PHASE_01 gate passing |
-| CONTEXT.md version | `v1.2` |
+| CONTEXT.md version | `v1.3` |
 
 ---
 
@@ -24,15 +24,15 @@ This phase implements the next MVP outcome from `docs/SPEC.md`: a doctor can cre
 ## Scope
 
 ### Backend
-- [ ] Add the doctor-patient relationship model required by MVP, with each patient linked to exactly one doctor
-- [ ] Implement doctor-only patient roster APIs for listing assigned patients and creating or activating a patient account
-- [ ] Add backend validation and authorization rules so doctors can manage only their own patients and patients can access only their own records
-- [ ] Implement MVP onboarding as a doctor-created patient account with a backend-generated temporary password, normal JWT login, and a required first-login password change before onboarding is marked complete
+- [x] Add the doctor-patient relationship model required by MVP, with each patient linked to exactly one doctor
+- [x] Implement doctor-only patient roster APIs for listing assigned patients and creating or activating a patient account
+- [x] Add backend validation and authorization rules so doctors can manage only their own patients and patients can access only their own records
+- [x] Implement MVP onboarding as a doctor-created patient account with a backend-generated temporary password, normal JWT login, and a required first-login password change before onboarding is marked complete
 
 ### Frontend
-- [ ] Add a doctor-facing patient roster view to the authenticated app shell
-- [ ] Build the doctor flow to create or activate a patient account from the web UI
-- [ ] Add the patient first-access flow that redirects temporary-password sessions to `/setup-account` until the patient sets a permanent password
+- [x] Add a doctor-facing patient roster view to the authenticated app shell
+- [x] Build the doctor flow to create or activate a patient account from the web UI
+- [x] Add the patient first-access flow that redirects temporary-password sessions to `/setup-account` until the patient sets a permanent password
 
 ---
 
@@ -172,10 +172,10 @@ feat(phase-02): add doctor patient relationship and onboarding flow
 
 ## Post-Phase Checklist
 
-- [ ] All automated gate checks green
-- [ ] All architect review notes resolved
-- [ ] `docs/CONTEXT.md` updated — run `/context-update 02`
-- [ ] `docs/STATE.md` phase row updated to `✅ done`
-- [ ] `docs/CHANGELOG.md` entry added (if CONTEXT.md version bumped)
+- [x] All automated gate checks green
+- [x] All architect review notes resolved
+- [x] `docs/CONTEXT.md` updated — run `/context-update 02`
+- [x] `docs/STATE.md` phase row updated to `✅ done`
+- [x] `docs/CHANGELOG.md` entry added (if CONTEXT.md version bumped)
 - [ ] Committed atomically on `feat/phase-02` branch
 - [ ] Tag created after merge to develop: `git tag -a v0.2.0 -m "Phase 02: Doctor-patient relationship and patient account onboarding"`

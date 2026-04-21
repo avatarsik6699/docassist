@@ -50,6 +50,22 @@ const isDark = computed({
       >
         {{ t('welcome') }}
       </NuxtLink>
+      <NuxtLink
+        v-if="authStore.user?.role === 'doctor'"
+        to="/patients"
+        class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/50 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
+        active-class="bg-primary-50 dark:bg-primary-900 text-primary-700 dark:text-primary-300"
+      >
+        {{ t('patients') }}
+      </NuxtLink>
+      <NuxtLink
+        v-if="authStore.requiresAccountSetup"
+        to="/setup-account"
+        class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-primary-50 dark:hover:bg-primary-900/50 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
+        active-class="bg-primary-50 dark:bg-primary-900 text-primary-700 dark:text-primary-300"
+      >
+        {{ t('setupAccount') }}
+      </NuxtLink>
     </nav>
 
     <!-- Settings / Lang -->
