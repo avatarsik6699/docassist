@@ -17,7 +17,7 @@
 | PHASE_02 | ✅ done | v0.2.0 | ✅   | ✅      | Gate green after fixing phase-specific smoke override and frontend SSR auth/session redirects |
 | PHASE_03 | ✅ done | v0.3.0 | ✅   | ✅      | Contract synced after landing medication assignment, patient adherence logging, and doctor adherence review |
 | PHASE_04 | ✅ done | v0.4.0 | ✅ | ✅ | Contract synced after landing questionnaire assignment, submission, and scoring for PHQ-9/GAD-7 |
-| PHASE_05 | ⏳ pending | v0.5.0 | — | — | Doctor patient view with recent history and safety highlighting |
+| PHASE_05 | ✅ done | v0.5.0 | ✅ | ✅ | Contract synced after landing doctor patient summary aggregation, safety highlighting, and patient side-effect reporting |
 
 <!-- Add new rows here via /phase-init N -->
 
@@ -59,6 +59,7 @@ None.
 
 | Date   | Event                                         |
 |--------|-----------------------------------------------|
+| 2026-04-21 | `PHASE_05` contract synced into `CONTEXT.md` `v1.6`; doctor patient summary, side-effect reporting, and safety highlighting marked complete |
 | 2026-04-21 | `PHASE_04` contract synced into `CONTEXT.md` `v1.5`; questionnaire assignment, submission, and scoring marked complete |
 | 2026-04-21 | `PHASE_03` contract synced into `CONTEXT.md` `v1.4`; medication tracking and adherence logging marked complete |
 | 2026-04-21 | `PHASE_02` gate passed and the doctor-patient onboarding contract was finalized into `CONTEXT.md` `v1.3` |

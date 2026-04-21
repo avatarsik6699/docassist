@@ -6,6 +6,28 @@
 
 ---
 
+## v1.6 — 2026-04-21 — Phase 05 Contract Synced
+
+**Type**: phase-completion
+**Author**: Codex (`/context-update`)
+**Triggered by**: Phase 05 implementation landed and the doctor patient summary plus side-effect reporting contract became active
+
+### Changes
+- Added side-effect reporting to the shared contract snapshot with severity-tagged patient submissions and doctor-visible history retrieval
+- Recorded the doctor patient summary aggregate endpoint combining questionnaire outcomes, adherence history, side effects, and derived safety flags
+- Advanced the schema snapshot to Alembic head `0005_side_effect_reports_and_patient_summary`
+
+### Affected Phases
+- PHASE_05 — implementation synchronized into the shared contract snapshot after a passing phase gate and resolved architect review items
+
+### Contract Updates
+- `CONTEXT.md` bumped from `v1.5` to `v1.6`
+- Added `SideEffectReport` to the active core model snapshot
+- Appended side-effect and patient-summary endpoints and expanded the schema table snapshot to include `side_effect_reports`
+
+### Notes
+This is an additive bump because Phase 05 extends the active workflow surface without removing or replacing Phase 01-04 behavior.
+
 ## v1.5 — 2026-04-21 — Phase 04 Contract Synced
 
 **Type**: phase-completion

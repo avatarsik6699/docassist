@@ -1,13 +1,13 @@
 {
   "_meta": {
-    "version": "v1.5",
+    "version": "v1.6",
     "format": "SDD CONTEXT.md — Single Source of Truth for AI agent",
     "update_rule": "Bump version on schema/API/type changes. Use /context-update skill after each phase.",
     "version_scheme": "patch (v1.0→v1.1) = additive only; minor (v1.1→v1.2) = breaking change"
   },
 
   "captured_at": "2026-04-21",
-  "phase_completed": "04",
+  "phase_completed": "05",
   "phase_in_progress": null,
 
   "stack": {
@@ -27,7 +27,8 @@
     "Medication (id UUID PK, patient_user_id UUID FK -> users.id, doctor_user_id UUID FK -> users.id, name, dosage_instructions, is_active, created_at, updated_at)",
     "AdherenceLog (id UUID PK, medication_id UUID FK -> medications.id, patient_user_id UUID FK -> users.id, status, deviation_note NULL, logged_at, created_at)",
     "QuestionnaireAssignment (id UUID PK, patient_user_id UUID FK -> users.id, doctor_user_id UUID FK -> users.id, questionnaire_code ENUM[PHQ-9/GAD-7], status ENUM[assigned/completed], assigned_at, completed_at NULL, created_at, updated_at)",
-    "QuestionnaireResponse (id UUID PK, assignment_id UUID FK -> questionnaire_assignments.id, patient_user_id UUID FK -> users.id, questionnaire_code ENUM[PHQ-9/GAD-7], answers JSONB, total_score, has_safety_signal, submitted_at, created_at)"
+    "QuestionnaireResponse (id UUID PK, assignment_id UUID FK -> questionnaire_assignments.id, patient_user_id UUID FK -> users.id, questionnaire_code ENUM[PHQ-9/GAD-7], answers JSONB, total_score, has_safety_signal, submitted_at, created_at)",
+    "SideEffectReport (id UUID PK, patient_user_id UUID FK -> users.id, doctor_user_id UUID FK -> users.id, medication_id UUID NULL FK -> medications.id, severity ENUM[mild/moderate/severe], symptom, note NULL, reported_at, created_at)"
   ],
 
   "endpoints_active": [
@@ -47,13 +48,16 @@
     "GET  /api/v1/patients/{patient_id}/questionnaires — assigned doctor lists questionnaire assignments for an assigned patient (JWT doctor)",
     "POST /api/v1/patients/{patient_id}/questionnaires — assigned doctor assigns PHQ-9 or GAD-7 to an assigned patient (JWT doctor)",
     "GET  /api/v1/questionnaires/pending — patient lists their pending questionnaire assignments (JWT patient)",
-    "POST /api/v1/questionnaires/{assignment_id}/submit — patient submits completed PHQ-9 or GAD-7 answers for scoring (JWT patient)"
+    "POST /api/v1/questionnaires/{assignment_id}/submit — patient submits completed PHQ-9 or GAD-7 answers for scoring (JWT patient)",
+    "POST /api/v1/side-effects — patient submits a side effect report for their assigned doctor with optional medication context (JWT patient)",
+    "GET  /api/v1/patients/{patient_id}/side-effects — assigned doctor reviews reported side effects for a patient (JWT doctor)",
+    "GET  /api/v1/patients/{patient_id}/summary — assigned doctor views aggregated questionnaire, adherence, side-effect, and safety-flag history (JWT doctor)"
   ],
 
   "db_schema": {
-    "tables": ["users", "doctor_profiles", "patient_profiles", "medications", "adherence_logs", "questionnaire_assignments", "questionnaire_responses"],
+    "tables": ["users", "doctor_profiles", "patient_profiles", "medications", "adherence_logs", "questionnaire_assignments", "questionnaire_responses", "side_effect_reports"],
     "source": "alembic_versions",
-    "current_head": "0004_questionnaire_assignments_and_responses"
+    "current_head": "0005_side_effect_reports_and_patient_summary"
   },
 
   "ui_pages_active": [
@@ -76,5 +80,5 @@
     "default_admin": "admin@example.com / changeme123 (migration 0001)"
   },
 
-  "notes": "Phase 04 contract is now active: assigned doctors can assign PHQ-9 and GAD-7 questionnaires to linked patients, patients can list pending assignments and submit validated responses, and stored total scores plus safety flags are now part of the shared data model. Phase 03 medication/adherence workflows, Phase 02 onboarding workflows, and Phase 01 authentication/foundation behavior remain active."
+  "notes": "Phase 05 contract is now active: patients can report side effects, and assigned doctors can review patient summary aggregates that combine questionnaire outcomes, adherence history, and side-effect signals with explicit safety highlighting. Phase 04 questionnaire workflows, Phase 03 medication/adherence workflows, Phase 02 onboarding workflows, and Phase 01 authentication/foundation behavior remain active."
 }
