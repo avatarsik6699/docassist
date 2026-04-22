@@ -49,7 +49,9 @@ services:
     restart: unless-stopped
     env_file: .env
     environment:
-      NUXT_API_BASE_INTERNAL: ${NUXT_API_BASE_INTERNAL:-http://backend:8000/api/v1}
+      # Nuxt reads NUXT_* from the container environment (env_file alone does not
+      # wire runtimeConfig correctly). Source them from user-facing .env keys.
+      NUXT_API_BASE_INTERNAL: ${API_BASE_INTERNAL_URL:-http://backend:8000/api/v1}
       NUXT_PUBLIC_API_BASE: ${API_BASE_URL:-http://localhost:8000/api/v1}
     depends_on:
       - backend

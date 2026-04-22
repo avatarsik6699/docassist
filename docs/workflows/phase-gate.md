@@ -25,9 +25,10 @@ Procedure:
 9. Run the frontend prep command from `docs/STACK.md`.
 10. Run the frontend typecheck command from `docs/STACK.md`.
 11. Run the frontend unit test command from `docs/STACK.md`.
-12. Run the e2e command from `docs/STACK.md`.
-13. Run the smoke command from `docs/STACK.md`, unless the phase file defines a phase-specific smoke override.
-14. Produce a table report with one row per check, include the architect review status, and return overall PASS only if automated checks are green and there are no unchecked architect review items.
+12. Run the E2E anti-flake lint command from `docs/STACK.md` (must fail on committed `waitForTimeout` usage).
+13. Run the e2e command from `docs/STACK.md` (Chromium is the single deterministic pass/fail browser for the reference stack).
+14. Run the smoke command from `docs/STACK.md`, unless the phase file defines a phase-specific smoke override.
+15. Produce a table report with one row per check, include the architect review status, and return overall PASS only if automated checks are green and there are no unchecked architect review items.
 
 Rules:
 
@@ -35,7 +36,7 @@ Rules:
 - do not commit
 - do not stop at the first failure; show the full picture
 - do use the repository's `.env` when bringing up Docker services or running containerized checks
-- do bring up the full stack yourself; the gate should verify the real end-to-end environment, not depend on a manual pre-step
+- do bring up the full stack yourself; the gate should verify the real end-to-end environment
 - do not treat unchecked architect review notes as informational; they block PASS until resolved
 - if the stack changes, update `docs/STACK.md`, not this workflow
 

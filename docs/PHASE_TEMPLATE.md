@@ -30,6 +30,9 @@
 ### Frontend
 - [ ] [task]
 
+<!-- Test execution is governed by `## Gate Checks` below + docs/STACK.md § Gate Commands.
+     Do not duplicate that list here. -->
+
 ---
 
 ## Files
@@ -49,20 +52,37 @@
 > This section is the source of truth for `/context-update`. Fill it in **before** handing to AI.
 
 ### New DB tables / columns
-<!-- Replace with a schema block when this phase introduces any. -->
+
 None
+<!-- Replace with:
+~~~
+table_name(col TYPE NOT NULL, ...)
+~~~
+when this phase introduces any. -->
 
 ### New API endpoints
-<!-- Replace with a table when this phase introduces any. -->
+
 None
+<!-- Replace with a table when this phase introduces any:
+| Method | Path | Auth | Response |
+|--------|------|------|----------|
+| `GET` | `/api/v1/[path]` | JWT | `{"field": type}` |
+-->
 
 ### New TypeScript types / Pinia stores
-<!-- Replace with a code block or concise list when this phase introduces any. -->
+
 None
+<!-- Replace with typed code fences when this phase introduces any. -->
 
 ### New env vars (add to `.env.example`)
-<!-- Replace with a table when this phase introduces any. -->
+
 None
+<!-- Replace with a table when this phase introduces any:
+| Key | Example value | Required |
+|-----|---------------|----------|
+| `VAR_NAME` | `value` | yes |
+-->
+
 
 ---
 
@@ -80,7 +100,7 @@ Use the commands in [docs/STACK.md](./STACK.md#gate-commands) as the source of t
 - backend tests
 - frontend prep and typecheck
 - frontend unit tests
-- e2e
+- e2e (deterministic Chromium for gate + PR CI)
 - the default smoke check
 
 If this phase needs a custom smoke target or other phase-specific note, record it here:

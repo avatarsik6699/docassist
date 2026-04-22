@@ -32,3 +32,4 @@ Thumbs.db
 pgdata/
 # uv.lock
 TODO.md
+tmp

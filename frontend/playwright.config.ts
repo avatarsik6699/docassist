@@ -1,8 +1,15 @@
 import { defineConfig, devices } from '@playwright/test';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
 
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
+const authFile = path.join(
+  path.dirname(fileURLToPath(import.meta.url)),
+  'tests/e2e/.auth/doctor.json'
+);
+
 export default defineConfig({
   testDir: './tests/e2e',
   /* Run tests in files in parallel */
@@ -35,11 +42,34 @@ export default defineConfig({
     testIdAttribute: 'data-testid',
   },
 
-  /* Run the canonical gate suite in Chromium only. */
   projects: [
     {
+      name: 'setup',
+      testMatch: /.*\.setup\.ts/,
+    },
+    {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: authFile,
+      },
+      dependencies: ['setup'],
+    },
+    {
+      name: 'firefox',
+      use: {
+        ...devices['Desktop Firefox'],
+        storageState: authFile,
+      },
+      dependencies: ['setup'],
+    },
+    {
+      name: 'webkit',
+      use: {
+        ...devices['Desktop Safari'],
+        storageState: authFile,
+      },
+      dependencies: ['setup'],
     },
   ],
 });

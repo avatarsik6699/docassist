@@ -68,6 +68,7 @@ STATUS_PYTEST="FAIL"
 STATUS_NUXT="FAIL"
 STATUS_TYPECHECK="FAIL"
 STATUS_VITEST="FAIL"
+STATUS_E2E_LINT="FAIL"
 STATUS_E2E="FAIL"
 STATUS_SMOKE="FAIL"
 STATUS_ARCHITECT="FAIL"
@@ -78,6 +79,7 @@ DETAIL_PYTEST=""
 DETAIL_NUXT=""
 DETAIL_TYPECHECK=""
 DETAIL_VITEST=""
+DETAIL_E2E_LINT=""
 DETAIL_E2E=""
 DETAIL_SMOKE=""
 DETAIL_ARCHITECT=""
@@ -393,8 +395,17 @@ fi
 DETAIL_VITEST="$(printf '%s' "$VITEST_OUTPUT" | extract_vitest_counts)"
 
 E2E_OUTPUT=""
+E2E_LINT_OUTPUT=""
 rm -f frontend/test-results/junit.xml
-if run_cmd E2E_OUTPUT bash -lc 'cd frontend && CI=1 pnpm test:e2e'; then
+if run_cmd E2E_LINT_OUTPUT bash -lc 'cd frontend && pnpm test:e2e:lint'; then
+  STATUS_E2E_LINT="PASS"
+  DETAIL_E2E_LINT="anti-flake policy enforced"
+else
+  STATUS_E2E_LINT="FAIL"
+  DETAIL_E2E_LINT="$(printf '%s' "$E2E_LINT_OUTPUT" | tail -n 1)"
+fi
+
+if run_cmd E2E_OUTPUT bash -lc 'cd frontend && CI=1 pnpm test:e2e --project=chromium'; then
   STATUS_E2E="PASS"
 else
   STATUS_E2E="FAIL"
@@ -447,7 +458,7 @@ fi
 overall="PASS"
 for status in \
   "$STATUS_INFRA" "$STATUS_MIGRATIONS" "$STATUS_PYTEST" "$STATUS_NUXT" \
-  "$STATUS_TYPECHECK" "$STATUS_VITEST" "$STATUS_E2E" "$STATUS_SMOKE" "$STATUS_ARCHITECT"; do
+  "$STATUS_TYPECHECK" "$STATUS_VITEST" "$STATUS_E2E_LINT" "$STATUS_E2E" "$STATUS_SMOKE" "$STATUS_ARCHITECT"; do
   if [[ "$status" != "PASS" ]]; then
     overall="FAIL"
     break
@@ -464,6 +475,7 @@ echo "| Backend tests | ${STATUS_PYTEST} | ${DETAIL_PYTEST} |"
 echo "| Nuxt prepare | ${STATUS_NUXT} | ${DETAIL_NUXT} |"
 echo "| Frontend type check | ${STATUS_TYPECHECK} | ${DETAIL_TYPECHECK} |"
 echo "| Frontend unit tests | ${STATUS_VITEST} | ${DETAIL_VITEST} |"
+echo "| E2E anti-flake lint | ${STATUS_E2E_LINT} | ${DETAIL_E2E_LINT} |"
 echo "| E2E | ${STATUS_E2E} | ${DETAIL_E2E} |"
 echo "| Smoke test | ${STATUS_SMOKE} | ${DETAIL_SMOKE} |"
 echo "| Architect review | ${STATUS_ARCHITECT} | ${DETAIL_ARCHITECT} |"

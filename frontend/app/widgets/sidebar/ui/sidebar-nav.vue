@@ -139,7 +139,7 @@ onMounted(() => {
       </div>
 
       <div v-if="authStore.user" class="app-user-card">
-        <p class="app-user-email">{{ authStore.user.email }}</p>
+        <p data-testid="user-email" class="app-user-email">{{ authStore.user.email }}</p>
         <UBadge size="xs" variant="subtle" color="primary">{{ userRoleLabel }}</UBadge>
       </div>
 
@@ -209,7 +209,7 @@ onMounted(() => {
         </div>
 
         <div v-if="authStore.user" class="app-user-card">
-          <p class="app-user-email">{{ authStore.user.email }}</p>
+          <p data-testid="user-email" class="app-user-email">{{ authStore.user.email }}</p>
           <UBadge size="xs" variant="subtle" color="primary">{{ userRoleLabel }}</UBadge>
         </div>
 
