@@ -53,7 +53,9 @@ test.describe('phase 05 patient summary safety highlighting', () => {
     await page.getByTestId('side-effect-symptom-input').fill('Persistent nausea');
     await page.getByTestId('side-effect-note-input').fill('Worse over 24 hours');
     await page.getByTestId('side-effect-submit').click();
-    await expect(page.getByTestId('side-effect-form-success')).toContainText('Side effect reported.');
+    await expect(page.getByTestId('side-effect-form-success')).toContainText(
+      'Side effect reported.'
+    );
 
     await page.goto('/dashboard');
     await page.getByTestId('logout-button').click();

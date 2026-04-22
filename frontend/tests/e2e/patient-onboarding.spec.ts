@@ -1,9 +1,4 @@
-import {
-  createPatientViaApi,
-  expect,
-  test,
-  unauthenticatedStorageState,
-} from './fixtures';
+import { createPatientViaApi, expect, test, unauthenticatedStorageState } from './fixtures';
 
 test.describe('phase 02 patient onboarding', () => {
   test('doctor sees newly created patient account in the roster', async ({
@@ -18,7 +13,9 @@ test.describe('phase 02 patient onboarding', () => {
     await page.getByTestId('open-patients-link').click();
     await expect(page).toHaveURL(/\/patients$/);
 
-    await expect(page.getByTestId('patients-table')).toContainText(uniqueEmail, { timeout: 15_000 });
+    await expect(page.getByTestId('patients-table')).toContainText(uniqueEmail, {
+      timeout: 15_000,
+    });
   });
 
   test.describe('patient first login flow', () => {
