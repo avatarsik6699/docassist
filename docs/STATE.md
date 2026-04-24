@@ -1,4 +1,4 @@
-# STATE: Docassist Development Tracker
+# STATE: [PROJECT_NAME] Development Tracker
 
 > **Status legend**
 > `⏳ pending` — not started
@@ -13,12 +13,7 @@
 
 | Phase    | Status     | Tag    | Gate | Expert | Notes                  |
 |----------|------------|--------|------|--------|------------------------|
-| PHASE_01 | ✅ done | v0.1.0 | ✅   | ✅      | Gate green after stabilizing phase-gate frontend warm-up and E2E execution |
-| PHASE_02 | ✅ done | v0.2.0 | ✅   | ✅      | Gate green after fixing phase-specific smoke override and frontend SSR auth/session redirects |
-| PHASE_03 | ✅ done | v0.3.0 | ✅   | ✅      | Contract synced after landing medication assignment, patient adherence logging, and doctor adherence review |
-| PHASE_04 | ✅ done | v0.4.0 | ✅ | ✅ | Contract synced after landing questionnaire assignment, submission, and scoring for PHQ-9/GAD-7 |
-| PHASE_05 | ✅ done | v0.5.0 | ✅ | ✅ | Contract synced after landing doctor patient summary aggregation, safety highlighting, and patient side-effect reporting |
-| PHASE_06 | ⏳ pending | v0.6.0 | — | — | Scaffolded; `docs/SPEC.md` does not yet define PHASE_06 scope |
+| PHASE_01 | ⏳ pending | v0.1.0 | ⬜   | -      | Foundation & Core Data |
 
 <!-- Add new rows here via /phase-init N -->
 
@@ -28,7 +23,7 @@
 
 <!-- Format: PHASE_XX [YYYY-MM-DD]: description — who must resolve it -->
 
-None.
+None
 
 ---
 
@@ -60,13 +55,6 @@ None.
 
 | Date   | Event                                         |
 |--------|-----------------------------------------------|
-| 2026-04-21 | `PHASE_05` contract synced into `CONTEXT.md` `v1.6`; doctor patient summary, side-effect reporting, and safety highlighting marked complete |
-| 2026-04-21 | `PHASE_04` contract synced into `CONTEXT.md` `v1.5`; questionnaire assignment, submission, and scoring marked complete |
-| 2026-04-21 | `PHASE_03` contract synced into `CONTEXT.md` `v1.4`; medication tracking and adherence logging marked complete |
-| 2026-04-21 | `PHASE_02` gate passed and the doctor-patient onboarding contract was finalized into `CONTEXT.md` `v1.3` |
-| 2026-04-20 | `PHASE_01` gate passed after stabilizing `/phase-gate`; phase contract finalized against `CONTEXT.md` `v1.2` |
-| 2026-04-20 | `PHASE_01` implementation synced into `CONTEXT.md` `v1.2`; closure remained blocked until E2E stabilization |
-| 2026-04-20 | `SPEC.md` refreshed for current template; MVP narrowed and deferred scope moved to `docs/SPEC_POST_MVP.md` |
 | [DATE] | Project initialized from sdd-template         |
 
 <!-- Add entries: [date]: PHASE_N completed / spec changed / blocker resolved -->

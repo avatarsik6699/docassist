@@ -39,12 +39,4 @@ retrieval:
 
 # spec-sync
 
-Canonical playbook:
-
-- `docs/workflows/spec-sync.md`
-
-Rules:
-
-- follow the workflow doc exactly
-- never rewrite a phase file from scratch
-- do not commit
+Execute the canonical playbook in [workflow/docs/playbooks/spec-sync.md](../../../../workflow/docs/playbooks/spec-sync.md). That file is the source of truth for impact analysis, the CHANGELOG entry format, and all sync rules.

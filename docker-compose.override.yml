@@ -17,7 +17,7 @@ services:
       - ./alembic:/app/alembic
 
   frontend:
-    # Run as the host user so bind-mounted writes (.nuxt, .output) stay owned
+    # Run as the host user so bind-mounted writes (reports, build artifacts) stay owned
     # by the developer on the host. Defaults to 1000:1000, the standard UID on
     # most Linux dev boxes and WSL. Override per-shell:  UID=$(id -u) GID=$(id -g) docker compose up
     user: "${UID:-1000}:${GID:-1000}"
@@ -27,12 +27,10 @@ services:
       context: ./frontend
       dockerfile: ../Dockerfile.frontend
       target: dev
-    environment:
-      NUXT_API_BASE_INTERNAL: http://backend:8000/api/v1
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    command: ["pnpm", "dev", "--host"]
+    command: ["pnpm", "dev"]
 
   nginx:
     command: ["nginx", "-g", "daemon off;", "-c", "/etc/nginx/project/nginx.dev.conf"]

@@ -1,7 +1,7 @@
 [project]
-name = "docassist"
+name = "my-project"
 version = "0.1.0"
-description = "Docassist backend"
+description = "[PROJECT_NAME] backend"
 requires-python = ">=3.13"
 dependencies = [
     "fastapi[standard]>=0.115.0",
@@ -13,7 +13,12 @@ dependencies = [
     "bcrypt>=4.0.0",
     "pydantic-settings>=2.6.0",
     "httpx>=0.27.0",
+    "typer>=0.24.0",
+    "pyyaml>=6.0",
 ]
+
+[project.scripts]
+sdd = "workflow.cli.main:main"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
@@ -51,4 +56,20 @@ dev = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["app"]
+packages = ["app", "workflow"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"workflow" = "workflow"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/app",
+    "/workflow",
+    "/scripts",
+    "/docs",
+    "/plugins",
+    "/README.md",
+    "/AGENTS.md",
+    "/CLAUDE.md",
+    "/Makefile",
+]

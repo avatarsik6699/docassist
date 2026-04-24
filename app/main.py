@@ -8,11 +8,6 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.auth import router as auth_router
 from app.api.v1.health import router as health_router
-from app.api.v1.medications import router as medications_router
-from app.api.v1.patient_summary import router as patient_summary_router
-from app.api.v1.patients import router as patients_router
-from app.api.v1.questionnaires import router as questionnaires_router
-from app.api.v1.side_effects import router as side_effects_router
 from app.core.config import settings
 from app.db.session import close_db, init_db
 
@@ -32,9 +27,9 @@ async def lifespan(app: FastAPI):  # type: ignore[type-arg]
 
 
 app = FastAPI(
-    title="Docassist",
-    version="0.5.0",
-    description="",
+    title="[PROJECT_NAME]",
+    version="0.1.0",
+    description="[PROJECT_DESCRIPTION]",
     lifespan=lifespan,
 )
 
@@ -58,8 +53,3 @@ async def add_request_id(request: Request, call_next: Any) -> Response:
 
 app.include_router(health_router, prefix=ROUTER_V1_PREFIX)
 app.include_router(auth_router, prefix=ROUTER_V1_PREFIX)
-app.include_router(patients_router, prefix=ROUTER_V1_PREFIX)
-app.include_router(medications_router, prefix=ROUTER_V1_PREFIX)
-app.include_router(questionnaires_router, prefix=ROUTER_V1_PREFIX)
-app.include_router(side_effects_router, prefix=ROUTER_V1_PREFIX)
-app.include_router(patient_summary_router, prefix=ROUTER_V1_PREFIX)

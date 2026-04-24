@@ -21,7 +21,8 @@ if [[ "${1:-}" =~ ^(-h|--help)$ ]]; then
   exit 0
 fi
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="${SDD_PROJECT_ROOT:-$(dirname "$SCRIPT_DIR")}"
 cd "$ROOT_DIR"
 
 PHASE_NUMBER="${1:-}"
@@ -65,7 +66,7 @@ fi
 STATUS_INFRA="FAIL"
 STATUS_MIGRATIONS="FAIL"
 STATUS_PYTEST="FAIL"
-STATUS_NUXT="FAIL"
+STATUS_FRONTEND_PREP="FAIL"
 STATUS_TYPECHECK="FAIL"
 STATUS_VITEST="FAIL"
 STATUS_E2E_LINT="FAIL"
@@ -76,7 +77,7 @@ STATUS_ARCHITECT="FAIL"
 DETAIL_INFRA=""
 DETAIL_MIGRATIONS=""
 DETAIL_PYTEST=""
-DETAIL_NUXT=""
+DETAIL_FRONTEND_PREP=""
 DETAIL_TYPECHECK=""
 DETAIL_VITEST=""
 DETAIL_E2E_LINT=""
@@ -355,17 +356,17 @@ else
 fi
 DETAIL_PYTEST="$(printf '%s' "$PYTEST_OUTPUT" | extract_pytest_counts)"
 
-NUXT_OUTPUT=""
-if run_cmd NUXT_OUTPUT bash -lc 'cd frontend && pnpm nuxt prepare'; then
+FRONTEND_PREP_OUTPUT=""
+if run_cmd FRONTEND_PREP_OUTPUT bash -lc 'cd frontend && pnpm typecheck'; then
   FRONTEND_RESTART_OUTPUT=""
   STACK_REFRESH_OUTPUT=""
   if run_cmd FRONTEND_RESTART_OUTPUT docker compose restart frontend \
-    && run_cmd STACK_REFRESH_OUTPUT ensure_stack_ready "frontend restart after pnpm nuxt prepare"; then
-    STATUS_NUXT="PASS"
-    DETAIL_NUXT="generated .nuxt, restarted frontend, and re-warmed frontend stack"
+    && run_cmd STACK_REFRESH_OUTPUT ensure_stack_ready "frontend restart after pnpm typecheck"; then
+    STATUS_FRONTEND_PREP="PASS"
+    DETAIL_FRONTEND_PREP="validated frontend graph, restarted frontend, and re-warmed stack"
   else
-    STATUS_NUXT="FAIL"
-    DETAIL_NUXT="$(
+    STATUS_FRONTEND_PREP="FAIL"
+    DETAIL_FRONTEND_PREP="$(
       {
         printf '%s\n' "$FRONTEND_RESTART_OUTPUT"
         printf '%s\n' "$STACK_REFRESH_OUTPUT"
@@ -373,8 +374,8 @@ if run_cmd NUXT_OUTPUT bash -lc 'cd frontend && pnpm nuxt prepare'; then
     )"
   fi
 else
-  STATUS_NUXT="FAIL"
-  DETAIL_NUXT="$(printf '%s' "$NUXT_OUTPUT" | tail -n 1)"
+  STATUS_FRONTEND_PREP="FAIL"
+  DETAIL_FRONTEND_PREP="$(printf '%s' "$FRONTEND_PREP_OUTPUT" | tail -n 1)"
 fi
 
 TYPECHECK_OUTPUT=""
@@ -394,9 +395,7 @@ else
 fi
 DETAIL_VITEST="$(printf '%s' "$VITEST_OUTPUT" | extract_vitest_counts)"
 
-E2E_OUTPUT=""
 E2E_LINT_OUTPUT=""
-rm -f frontend/test-results/junit.xml
 if run_cmd E2E_LINT_OUTPUT bash -lc 'cd frontend && pnpm test:e2e:lint'; then
   STATUS_E2E_LINT="PASS"
   DETAIL_E2E_LINT="anti-flake policy enforced"
@@ -405,6 +404,8 @@ else
   DETAIL_E2E_LINT="$(printf '%s' "$E2E_LINT_OUTPUT" | tail -n 1)"
 fi
 
+E2E_OUTPUT=""
+rm -f frontend/test-results/junit.xml
 if run_cmd E2E_OUTPUT bash -lc 'cd frontend && CI=1 pnpm test:e2e --project=chromium'; then
   STATUS_E2E="PASS"
 else
@@ -457,7 +458,7 @@ fi
 
 overall="PASS"
 for status in \
-  "$STATUS_INFRA" "$STATUS_MIGRATIONS" "$STATUS_PYTEST" "$STATUS_NUXT" \
+  "$STATUS_INFRA" "$STATUS_MIGRATIONS" "$STATUS_PYTEST" "$STATUS_FRONTEND_PREP" \
   "$STATUS_TYPECHECK" "$STATUS_VITEST" "$STATUS_E2E_LINT" "$STATUS_E2E" "$STATUS_SMOKE" "$STATUS_ARCHITECT"; do
   if [[ "$status" != "PASS" ]]; then
     overall="FAIL"
@@ -472,7 +473,7 @@ echo "|---|---|---|"
 echo "| Infrastructure | ${STATUS_INFRA} | ${DETAIL_INFRA} |"
 echo "| Migrations | ${STATUS_MIGRATIONS} | ${DETAIL_MIGRATIONS} |"
 echo "| Backend tests | ${STATUS_PYTEST} | ${DETAIL_PYTEST} |"
-echo "| Nuxt prepare | ${STATUS_NUXT} | ${DETAIL_NUXT} |"
+echo "| Frontend prep | ${STATUS_FRONTEND_PREP} | ${DETAIL_FRONTEND_PREP} |"
 echo "| Frontend type check | ${STATUS_TYPECHECK} | ${DETAIL_TYPECHECK} |"
 echo "| Frontend unit tests | ${STATUS_VITEST} | ${DETAIL_VITEST} |"
 echo "| E2E anti-flake lint | ${STATUS_E2E_LINT} | ${DETAIL_E2E_LINT} |"

@@ -1,20 +1,21 @@
-# Template Repo Claude Adapter
+# Docassist — Claude Code adapter
 
-Read [AGENTS.md](AGENTS.md) first. It is the source of truth for the shared rules used to maintain this template.
+**Start here:** read [`AGENTS.md`](AGENTS.md). It is the source of truth for all process rules — scope lock, gates, library lookup, git workflow, permission-denied handling, spec-sync protocol, CONTEXT.md version rules, and phase lifecycle.
 
-## Template Repo Guardrails
+This file only adds Claude-specific items.
 
-- This repository is the template, not a live product.
-- Do not treat `docs/` as active requirements; placeholders are intentional.
-- Do not run derived-project workflows here unless you are explicitly testing those workflows.
+## Slash commands (Claude Code skills)
 
-## Skill Testing
+| Command | When to use | Wraps workflow |
+|---------|-------------|----------------|
+| `/spec-init [--new\|--continue] [project brief]` | Draft, reset, or continue `docs/SPEC.md` from high-level requirements | [workflow/docs/playbooks/spec-init.md](workflow/docs/playbooks/spec-init.md) |
+| `/phase-init [N]` | Scaffold the next `docs/PHASE_XX.md` from SPEC | [workflow/docs/playbooks/phase-init.md](workflow/docs/playbooks/phase-init.md) |
+| `/phase-gate [N]` | Validate a phase before committing | [workflow/docs/playbooks/phase-gate.md](workflow/docs/playbooks/phase-gate.md) |
+| `/spec-sync [description]` | Immediately after editing `docs/SPEC.md` | [workflow/docs/playbooks/spec-sync.md](workflow/docs/playbooks/spec-sync.md) |
+| `/context-update [N]` | After the gate passes | [workflow/docs/playbooks/context-update.md](workflow/docs/playbooks/context-update.md) |
 
-- When testing `/phase-init`, `/phase-gate`, `/context-update`, or `/spec-sync`, use a scratch directory or a derived-project copy.
-- Do not mutate this repo's template `docs/` as if they were project state.
+Skill wrappers live in `.claude/skills/` and are intentionally thin — they just point at the playbooks in `workflow/docs/playbooks/`.
 
-## Claude-Specific Notes
+## MCP and Context7 setup
 
-- Claude slash commands map to the workflow playbooks in `docs/workflows/`.
-- Claude skill wrappers live under `.claude/skills/`.
-- Keep references aligned across `AGENTS.md`, `README.md`, `human-instructions/`, `docs/workflows/`, and `.claude/skills/` whenever the pipeline changes.
+Per `AGENTS.md § Library Documentation Lookup`, prefer Context7 via MCP when available. For one-time MCP configuration notes (both Claude Code and Codex), see [docs/AGENT_SETUP.md](docs/AGENT_SETUP.md).

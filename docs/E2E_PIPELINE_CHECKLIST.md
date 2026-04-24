@@ -1,12 +1,12 @@
 # E2E Pipeline Checklist (Playwright)
 
-Use this checklist when bootstrapping CI and branch-protection rules in projects created from this template.
+Use this checklist only if a derived project explicitly decides to add Playwright E2E to CI. By default, this template keeps E2E local-only via `/phase-gate`.
 
-## Required PR gate
+## Optional PR gate
 
-- [ ] Use `CI` workflow as the single required PR path for E2E.
-- [ ] Require job/check name `E2E (Chromium)` in branch protection.
-- [ ] Keep Chromium as the only pass/fail browser for required checks.
+- [ ] Use `CI` workflow as the single PR path for E2E if you enable CI execution.
+- [ ] Require job/check name `E2E (Chromium)` in branch protection only if you intentionally make E2E gating in CI.
+- [ ] Keep Chromium as the only pass/fail browser for CI-required checks.
 - [ ] Keep cross-browser runs (`pnpm test:e2e:all`) optional and non-gating unless explicitly upgraded by project policy.
 
 ## Deterministic execution contract

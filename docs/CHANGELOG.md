@@ -6,138 +6,26 @@
 
 ---
 
-## v1.6 — 2026-04-21 — Phase 05 Contract Synced
+## v0.1.0 — 2026-04-24 — First Published Template Release
 
-**Type**: phase-completion
-**Author**: Codex (`/context-update`)
-**Triggered by**: Phase 05 implementation landed and the doctor patient summary plus side-effect reporting contract became active
-
-### Changes
-- Added side-effect reporting to the shared contract snapshot with severity-tagged patient submissions and doctor-visible history retrieval
-- Recorded the doctor patient summary aggregate endpoint combining questionnaire outcomes, adherence history, side effects, and derived safety flags
-- Advanced the schema snapshot to Alembic head `0005_side_effect_reports_and_patient_summary`
-
-### Affected Phases
-- PHASE_05 — implementation synchronized into the shared contract snapshot after a passing phase gate and resolved architect review items
-
-### Contract Updates
-- `CONTEXT.md` bumped from `v1.5` to `v1.6`
-- Added `SideEffectReport` to the active core model snapshot
-- Appended side-effect and patient-summary endpoints and expanded the schema table snapshot to include `side_effect_reports`
-
-### Notes
-This is an additive bump because Phase 05 extends the active workflow surface without removing or replacing Phase 01-04 behavior.
-
-## v1.5 — 2026-04-21 — Phase 04 Contract Synced
-
-**Type**: phase-completion
-**Author**: Codex (`/context-update`)
-**Triggered by**: Phase 04 implementation landed and the questionnaire assignment, submission, and scoring contract became active
+**Type**: addendum
+**Author**: template-maintainer
+**Triggered by**: Template repository release cut for namespaced workflow/template tags
 
 ### Changes
-- Added questionnaire assignment and response contracts for supported `PHQ-9` and `GAD-7` workflows
-- Recorded doctor and patient questionnaire API endpoints for assignment listing/creation, pending retrieval, and submission
-- Captured the patient questionnaire completion route and advanced the schema snapshot to Alembic head `0004_questionnaire_assignments_and_responses`
+- Published template release coordinate: `template/fastapi-react-router/v0.1.0`
+- Published compatible workflow coordinate: `workflow/v0.1.0`
+- Added released-artifact validation/status flow for maintainers
+- Hardened upgrade baseline integrity by ignoring local `.claude/settings.local.json`
 
 ### Affected Phases
-- PHASE_04 — implementation synchronized into the shared contract snapshot after the phase deliverables landed
+- None (template maintainer release surface)
 
 ### Contract Updates
-- `CONTEXT.md` bumped from `v1.4` to `v1.5`
-- Added `QuestionnaireAssignment` and `QuestionnaireResponse` to the active core model snapshot
-- Appended questionnaire endpoints and expanded the schema table snapshot to include `questionnaire_assignments` and `questionnaire_responses`
+- No SPEC/CONTEXT schema change; release metadata and upgrade behavior hardened
 
 ### Notes
-This is an additive bump because Phase 04 extends the active contract surface without replacing existing Phase 01-03 behavior.
-
-## v1.4 — 2026-04-21 — Phase 03 Contract Synced
-
-**Type**: phase-completion
-**Author**: Codex (`/context-update`)
-**Triggered by**: Phase 03 implementation landed and the medication tracking plus adherence contract became active
-
-### Changes
-- Added medication tracking and adherence logging to the shared repository contract snapshot
-- Recorded the new doctor and patient API surface for medication assignment, current medication lookup, adherence submission, and adherence history review
-- Advanced the schema snapshot to Alembic head `0003_medications_and_adherence`
-
-### Affected Phases
-- PHASE_03 — implementation synchronized into the shared contract snapshot after the phase deliverables landed
-
-### Contract Updates
-- `CONTEXT.md` bumped from `v1.3` to `v1.4`
-- Added `Medication` and `AdherenceLog` to the active core model snapshot
-- Appended medication and adherence endpoints and expanded the schema table snapshot to include `medications` and `adherence_logs`
-
-### Notes
-This is an additive bump because Phase 03 extends the active doctor-patient workflow without replacing the existing Phase 01 or Phase 02 contract surface.
-
-## v1.3 — 2026-04-21 — Phase 02 Contract Synced
-
-**Type**: phase-completion
-**Author**: Codex (`/context-update`)
-**Triggered by**: Phase 02 implementation landed and the doctor-patient onboarding contract became active
-
-### Changes
-- Added the doctor-patient relationship contract to the shared repository memory
-- Recorded the active patient roster API surface for doctor-managed create, list, activate, and patient setup-account flows
-- Captured the new authenticated UI surface for doctor roster management and patient first-login onboarding
-- Advanced the schema snapshot to Alembic head `0002_doctor_patient_profiles`
-
-### Affected Phases
-- PHASE_02 — implementation synchronized into the shared contract snapshot after a passing gate and manual verification
-
-### Contract Updates
-- `CONTEXT.md` bumped from `v1.2` to `v1.3`
-- Added `DoctorProfile` and `PatientProfile` to the active core model snapshot
-- Appended the `/api/v1/patients` and `/api/v1/patients/setup-account` endpoints plus the `/patients` and `/setup-account` frontend routes
-
-### Notes
-This is an additive bump because Phase 02 extends the active contract without replacing the Phase 01 surface. The phase gate is green, though the current phase-specific smoke command still only checks that the roster endpoint responds rather than asserting a doctor-authenticated payload.
-
-## v1.2 — 2026-04-20 — Phase 01 Contract Synced
-
-**Type**: breaking-change
-**Author**: Codex (`/context-update`)
-**Triggered by**: Phase 01 implementation landed and replaced stale template contract details in `CONTEXT.md`
-
-### Changes
-- Synced the Phase 01 foundation contract for the live template repository
-- Confirmed the `users` model now uses the real role taxonomy: `admin`, `doctor`, `patient`
-- Locked in the active auth surface: health check, login, current-user lookup, and logout stub
-- Recorded the seeded admin account and active Nuxt auth shell as part of the repository memory
-
-### Affected Phases
-- PHASE_01 — implementation synchronized into the shared contract snapshot; phase closure still blocked by failing E2E expectations
-
-### Contract Updates
-- `CONTEXT.md` bumped from `v1.0` to `v1.2`
-- Replaced the stale template role enum in `core_models`
-- Refreshed phase pointers and repository notes to reflect the shipped foundation
-
-### Notes
-The version bump is breaking rather than additive because the previous `CONTEXT.md` snapshot still described placeholder role values from the template instead of the implemented Phase 01 contract. The current gate blocker is in Playwright, where two tests still expect the login submit button to be enabled before form input is provided.
-
-## v1.0 — 2026-04-20 — SPEC Reset For Current Template
-
-**Type**: spec-change
-**Author**: Codex
-**Triggered by**: Derived project still used an older, implementation-heavy spec format after the template evolved
-
-### Changes
-- `SPEC.md` was rewritten to match the current template intent: product problem, users, MVP scope, rules, constraints, and release strategy
-- MVP scope was reduced to the core psychiatry monitoring loop instead of the broader platform vision
-- Deferred functionality was preserved in new file `docs/SPEC_POST_MVP.md` instead of being removed
-
-### Affected Phases
-- None yet; no concrete `PHASE_XX.md` files exist in this repository
-
-### Contract Updates
-- `CONTEXT.md` unchanged
-- No implementation contract was asserted by this doc-only reset
-
-### Notes
-The old spec contained many details that belong in architecture, testing, or later phase contracts rather than the product spec itself.
+- This entry documents template release readiness for generated projects based on tagged artifacts.
 
 ---
 

@@ -13,7 +13,7 @@
 
 ### Docker-owned files break host operations (`EACCES` / `EPERM` / read-only)
 
-- **Symptoms**: file operations fail with `EACCES`, `EPERM`, "Permission denied", or "Read-only file system". Most common paths: `frontend/.nuxt/`, `frontend/.output/`, `node_modules/.cache/`, `__pycache__/`.
+- **Symptoms**: file operations fail with `EACCES`, `EPERM`, "Permission denied", or "Read-only file system". Most common paths: `frontend/node_modules/`, `frontend/build/`, `frontend/playwright-report/`, `__pycache__/`.
 - **Root cause**: a Docker container wrote to a bind-mounted host directory as root.
 - **Fix (host)**:
   ```bash

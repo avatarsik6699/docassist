@@ -22,6 +22,16 @@
 
 ---
 
+## Design References
+
+<!-- Optional. Populated by /phase-init when Figma screenshots are provided.
+     Remove this section entirely if no design assets exist for this phase.
+     Format: `Screen name — brief description (key components, interactions)` -->
+
+<!-- none provided -->
+
+---
+
 ## Scope
 
 ### Backend
@@ -100,7 +110,7 @@ Use the commands in [docs/STACK.md](./STACK.md#gate-commands) as the source of t
 - backend tests
 - frontend prep and typecheck
 - frontend unit tests
-- e2e (deterministic Chromium for gate + PR CI)
+- e2e (deterministic Chromium for the local gate; optional in CI if the project enables it)
 - the default smoke check
 
 If this phase needs a custom smoke target or other phase-specific note, record it here:

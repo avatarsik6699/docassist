@@ -1,5 +1,4 @@
 import os
-from uuid import uuid4
 
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -28,12 +27,7 @@ if TEST_DATABASE_URL.startswith("sqlite"):
 os.environ.setdefault("DATABASE_URL", TEST_DATABASE_URL)
 os.environ.setdefault("SECRET_KEY", "test-secret-key-for-ci-only")
 
-import app.db.models  # noqa: F401, E402
-from app.core.auth import create_access_token, hash_password  # noqa: E402
 from app.db.base import Base  # noqa: E402
-from app.db.models.doctor_profile import DoctorProfile  # noqa: E402
-from app.db.models.patient_profile import OnboardingStatus, PatientProfile  # noqa: E402
-from app.db.models.user import User, UserRole  # noqa: E402
 from app.db.session import get_db  # noqa: E402
 from app.main import app  # noqa: E402
 
@@ -85,95 +79,3 @@ async def client(db_session: AsyncSession) -> AsyncClient:
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         yield ac
     app.dependency_overrides.clear()
-
-
-@pytest.fixture()
-async def doctor_user(db_session: AsyncSession) -> User:
-    user = User(
-        email=f"doctor_{uuid4().hex[:8]}@example.com",
-        hashed_password=hash_password("changeme123"),
-        role=UserRole.doctor,
-        is_active=True,
-    )
-    db_session.add(user)
-    await db_session.flush()
-    db_session.add(DoctorProfile(user_id=user.id))
-    await db_session.commit()
-    await db_session.refresh(user)
-    return user
-
-
-@pytest.fixture()
-def doctor_headers(doctor_user: User) -> dict[str, str]:
-    token = create_access_token({"sub": str(doctor_user.id), "role": doctor_user.role.value})
-    return {"Authorization": f"Bearer {token}"}
-
-
-@pytest.fixture()
-async def other_doctor_user(db_session: AsyncSession) -> User:
-    user = User(
-        email=f"doctor_other_{uuid4().hex[:8]}@example.com",
-        hashed_password=hash_password("changeme123"),
-        role=UserRole.doctor,
-        is_active=True,
-    )
-    db_session.add(user)
-    await db_session.flush()
-    db_session.add(DoctorProfile(user_id=user.id))
-    await db_session.commit()
-    await db_session.refresh(user)
-    return user
-
-
-@pytest.fixture()
-async def patient_user(db_session: AsyncSession, doctor_user: User) -> User:
-    user = User(
-        email=f"patient_{uuid4().hex[:8]}@example.com",
-        hashed_password=hash_password("temporary123"),
-        role=UserRole.patient,
-        is_active=True,
-    )
-    db_session.add(user)
-    await db_session.flush()
-    db_session.add(
-        PatientProfile(
-            user_id=user.id,
-            doctor_user_id=doctor_user.id,
-            onboarding_status=OnboardingStatus.pending.value,
-            must_change_password=True,
-            is_active_with_doctor=True,
-        )
-    )
-    await db_session.commit()
-    await db_session.refresh(user)
-    return user
-
-
-@pytest.fixture()
-async def other_patient_user(db_session: AsyncSession, other_doctor_user: User) -> User:
-    user = User(
-        email=f"patient_other_{uuid4().hex[:8]}@example.com",
-        hashed_password=hash_password("temporary123"),
-        role=UserRole.patient,
-        is_active=True,
-    )
-    db_session.add(user)
-    await db_session.flush()
-    db_session.add(
-        PatientProfile(
-            user_id=user.id,
-            doctor_user_id=other_doctor_user.id,
-            onboarding_status=OnboardingStatus.pending.value,
-            must_change_password=True,
-            is_active_with_doctor=True,
-        )
-    )
-    await db_session.commit()
-    await db_session.refresh(user)
-    return user
-
-
-@pytest.fixture()
-def patient_headers(patient_user: User) -> dict[str, str]:
-    token = create_access_token({"sub": str(patient_user.id), "role": patient_user.role.value})
-    return {"Authorization": f"Bearer {token}"}

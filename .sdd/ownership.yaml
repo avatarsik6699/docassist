@@ -1,0 +1,53 @@
+project_metadata_version: '0.1'
+generated_at: '2026-04-24T19:26:13Z'
+ownership:
+  workflow-managed:
+  - AGENTS.md
+  - CLAUDE.md
+  - workflow/**
+  template-managed:
+  - .agents/plugins/marketplace.json
+  - .claude/**
+  - .dockerignore
+  - .env.example
+  - .gitattributes
+  - .github/workflows/**
+  - .gitignore
+  - .nvmrc
+  - .pre-commit-config.yaml
+  - .python-version
+  - .vscode/settings.json
+  - DEPLOY.md
+  - Dockerfile.backend
+  - Dockerfile.frontend
+  - Makefile
+  - alembic.ini
+  - docker-compose.ci.yml
+  - docker-compose.override.yml
+  - docker-compose.prod.yml
+  - docker-compose.yml
+  - docs/STACK.md
+  - entrypoint.sh
+  - nginx/**
+  - plugins/sdd-workflow/**
+  - scripts/**
+  user-owned:
+  - README.md
+  - TODO.md
+  - alembic/**
+  - app/**
+  - docs/AGENT_SETUP.md
+  - docs/CHANGELOG.md
+  - docs/CONTEXT.md
+  - docs/DECISIONS.md
+  - docs/E2E_PIPELINE_CHECKLIST.md
+  - docs/KNOWN_GOTCHAS.md
+  - docs/PHASE_01.md
+  - docs/PHASE_TEMPLATE.md
+  - docs/SPEC.md
+  - docs/STATE.md
+  - frontend/**
+  - tests/**
+  merge-required:
+  - pyproject.toml
+  - uv.lock

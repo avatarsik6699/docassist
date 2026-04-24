@@ -16,7 +16,7 @@ RUN pnpm install --frozen-lockfile
 FROM deps AS dev
 
 EXPOSE 3000
-CMD ["pnpm", "dev", "--host"]
+CMD ["pnpm", "dev"]
 
 # Stage 3: production build
 FROM deps AS builder
@@ -35,8 +35,8 @@ RUN corepack enable \
 
 USER node
 
-COPY --from=builder --chown=node:node /app/.output ./
+COPY --from=builder --chown=node:node /app/build ./build
 
 EXPOSE 3000
 
-CMD ["node", "server/index.mjs"]
+CMD ["pnpm", "start"]

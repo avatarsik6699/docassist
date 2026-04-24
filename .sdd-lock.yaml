@@ -1,0 +1,76 @@
+project_metadata_version: '0.1'
+generated_at: '2026-04-24T19:26:13Z'
+workflow:
+  version: template/fastapi-nuxt/v0.1.0-17-g8f38d2d
+  baseline_hashes:
+    CLAUDE.md: f04a380438ee0d627cfde51e29dbb1ed126f1d3f76f5dc953468676464c05e5d
+    AGENTS.md: b1aef38c6e23d1eb2cdb4916d7d63afb4d3a620d62af5aed4881f5154974b9aa
+    workflow/__init__.py: d681b371b22a1a3d8e2a6a7e640fc0897737394a6ff0c3ba32cda93a65500bd5
+    workflow/project-files/CLAUDE.md.template: 746818edba6d92a1df2a0dc18ff8cfc508890e6f6bbb3f323af105826d2d9a42
+    workflow/project-files/AGENTS.md.template: 930d4c5ddb5efc221ba41434e4855a076f28409521d17d95197802293cec7f23
+    workflow/cli/__main__.py: 55d870f180352b7c0f3256c94182f95aabd1cc0295799d7a9994053bd551982a
+    workflow/cli/__init__.py: 5ee9d3f4c445153c2b2d8e7a01692aee857868c2170008ac0cd3b37b1c4f4214
+    workflow/cli/main.py: 7ffb9cfe312b1c9d1cc43b930042bbf42c80269fff07d99950396a4b12ec372f
+    workflow/docs/playbooks/spec-sync.md: 86daf51bca39ad20e49f648f5bcf897fe926dbe49d19a7ddf7ce3a5d089af3b7
+    workflow/docs/playbooks/context-update.md: 2ddb0318dc71017e779cb3aa3ec48143518dcbfd999fe0e1de856a4129c50295
+    workflow/docs/playbooks/phase-gate.md: 53b52a663029ec2ce76ed9e71b4c1320402dd822633088b034510e13e63bf3f5
+    workflow/docs/playbooks/phase-init.md: 761a7e430702e9410c44f13108956fd97771afaa0ed286b2c7514f697d379997
+    workflow/docs/playbooks/spec-init.md: aff2885f1520ab59672980592e29e98eb1891edfbd20bf6dd94fa61e938cda09
+    workflow/docs/playbooks/README.md: 9787b121daf3b10ec0ad1740ccba4e1c7815ba51c6e2fa8b7425d75eb6a175a7
+template:
+  id: fastapi-react-router
+  version: 0.1.0
+  manifest_schema_version: '0.1'
+  baseline_hashes:
+    .dockerignore: 84c404b33be8649335d04366645e589ac4e898f3e2241712d9c65583d12a8a42
+    docker-compose.yml: e0129d2e85a4bb6de5747451102c5aef119d1a40b40f52c9902d6fcdfa7ea57d
+    .python-version: 02e735b3dfe1c32833eb550b7ff8ffa17f5f2bc3fa1e7bae61a8f5a3883ce398
+    .pre-commit-config.yaml: 9594921f833fd883903e5433a62edb59f3a5c224c338bec56c085a39f03747fc
+    alembic.ini: f0a9aa4df3046c840ffcda9a77fbc0dcd4d0e49a213c8ac17fb47cc94ea2c494
+    Dockerfile.frontend: 0c5efc9dcf5a856af48a28ae92f94b46914670493b213fba4b94f7b45f04c078
+    .nvmrc: f14b4987904bcb5814e4459a057ed4d20f58a633152288a761214dcd28780b56
+    entrypoint.sh: dea991cca9756a01337a0e622966071628e84a1b09e8eb5e93f20e27696facb0
+    .gitattributes: f70d755466b101646b043fe3c62c4f8a39eae827c1a2a303a2d39ccd93f534f8
+    Dockerfile.backend: 70da4616f80cc714e2f3ee4752c557294b167a7f4e5e258c09ffcb926cdcccaa
+    Makefile: 0e55ec78956ad09554d7718deb38d5c33aa2c2f7f26168486dfd83ea3bbfc949
+    docker-compose.prod.yml: ac16586218688a6087108fbf82f9bed6e2939d7f9d13764354dbd599098cba4d
+    DEPLOY.md: 612426b7b78b1327a45905fd9d19100de37c57d87bb73f9bf286efff5a0d26f8
+    pyproject.toml: 48a69dbb240394f6ffa70ad4d6588c73a0e02711b1f3401ae38166c540e369ce
+    .gitignore: a709eac58e684faa3efabff7b647dd0b746d3554debd2877e8fb5b32c9ec8b31
+    .env.example: 8575690f262e246c2ed353ce95ed8aa4d20ed2a92e04b24bb7dbb82ae7e06ae2
+    uv.lock: dbb98660b8d4e1662395fc8430ff5ae100a1a7456ba48c02f847b7e6d3ea01c0
+    docker-compose.override.yml: 41de1eada351099168c18fd9f0d1e7b44331a459e45ddf8f3ace7f448aa16434
+    docker-compose.ci.yml: 8773947db3e8ad653a6cf59bdfa3e3102f8585a0918991528e51bc151a90fc22
+    nginx/nginx.dev.conf: 5000b5f7c8ff54bac6f988740971e1be748dec5a64f9c38b0bda05672d3d39a8
+    nginx/nginx.conf: 1bc98a9246227928d84348c589815876a30213d00366c15a674aaba1e77960b7
+    .vscode/settings.json: 28472e427a64c7705c67207efd673f6d358ddf06cf5a09e4e93d56ae40c460f8
+    scripts/init-project.sh: ebc945314f09b84226fc4c8b0c084e86708652de52eeb321ca5cdca0af430226
+    scripts/setup-prod.sh: f199f0078ce1ac1c8e46dc4b574c87a66d9f9890345937ba393c793b6fb0f6b6
+    scripts/phase-gate.sh: 59ba41ecee1d1f45f6cf6e49ddf3e7934dfadc23e59f7f0a935b8821bd0564f1
+    scripts/install-caveman.sh: 380dbf233689ba7efbd64227a0ecaf74a794c16efa830a11c208c28e8e1a5b01
+    .claude/settings.local.json: 888d887e09e5c6c3d6dc7d1c775ebd31ad7d83252b8667c4ddc32d577431eb47
+    docs/STACK.md: 8a1af7e21628020e2a46f89708fb097dcc7e5c2306693cd79e525e419e75f86f
+    .github/workflows/ci.yml: ab03f7e86040bcbe092786c27b844b78c596c604b489939114d23a12da74b608
+    .github/workflows/deploy.yml: c4a4f80e2f7e1b8da12a7b21fd21736869ff0cddb84b47828236650618f8d335
+    plugins/sdd-workflow/hooks.json: 8e815afc6cbc7e121d95236f651bbcbe6841d674aed830122bba1902d8ef1996
+    plugins/sdd-workflow/.mcp.json: dec16c3c149f48e96895386691d5614515b791077321c46ca0adc8179887be8f
+    plugins/sdd-workflow/README.md: 713a70065c0b3f505fd63db8427f6db2310d47f116655f7ef40bf263c4beb9c5
+    plugins/sdd-workflow/.codex-plugin/plugin.json: 7c002facbec306eb28e2f22320425d0d5dc1fabe80ae38ef749fc910b623be1d
+    plugins/sdd-workflow/scripts/block-dangerous-bash.sh: 26a912d5e5f7be2e0092c9a48599bc8b27487b1fcc1ac1fdae7aadb43c6af331
+    plugins/sdd-workflow/scripts/format-after-write.sh: a9108a7061196bf18e6da7a97fba846306e07730349be933b7d43c243773b87a
+    plugins/sdd-workflow/commands/spec-sync.md: c7918b9c5ddfce90fd3dea121f95f23adb49c45894cca5bb728a59af319f3547
+    plugins/sdd-workflow/commands/context-update.md: 865556a00be27f9a528c3a32a2ccfbff612e48a79be68338011ca61c3de7e511
+    plugins/sdd-workflow/commands/phase-gate.md: cab01152f968ecade78cbd01f1981ef35f7a526a2f900ac373763ce94e43e04d
+    plugins/sdd-workflow/commands/phase-init.md: eb15062691d747b468cff03eff4be3fb308065729b89482f32e162b82e97df7d
+    plugins/sdd-workflow/commands/spec-init.md: 4e76b2a8006efaa098b5f1f87c7a1bda98fa41720a6bc9b2de98488ee8b40093
+    plugins/sdd-workflow/skills/context-update/SKILL.md: 20f272f2802e778ed684aa5f028160ca0b77ca02e1d9a538ad3b6f7f6cd073df
+    plugins/sdd-workflow/skills/spec-init/SKILL.md: 9471e0fc0ca4015c4166edbf5054ceeb00a2732ae5bb164b9ad419447246f1eb
+    plugins/sdd-workflow/skills/phase-gate/SKILL.md: 8afef706b73eb2f6e5b11e542f81c9447b506c6de1384bcafd0d60895ec8a039
+    plugins/sdd-workflow/skills/spec-sync/SKILL.md: 2c5606dfcd3a47680783c84f8840f03f04779f6cf0b79ab40ee5d12b42eaf674
+    plugins/sdd-workflow/skills/phase-init/SKILL.md: 2094dc9d370491fc817d9bc1362220ec778e5cff14735b35d22ccb0be0fae2ad
+    .claude/skills/context-update/SKILL.md: bce51363e151541a048b4c39cb8c0b80e2fc9d03107911d5ffa33c65b6164b19
+    .claude/skills/spec-init/SKILL.md: ff1a02dffa232b26536728d69f6ab27793e52db7a5b3aab0a25c9fb41185bfbc
+    .claude/skills/phase-gate/SKILL.md: dfe692823a1f592ce0c09c283133172d2070b6998f23ffdff90c83f1ad8c4417
+    .claude/skills/spec-sync/SKILL.md: 5c146aa6eb33ef1f94ded6208b7ddfe3557fc462965fc048a9b21ecd46f6f370
+    .claude/skills/phase-init/SKILL.md: 4b97c604fe4232900b022f8f7aa3788ec6deff2fe9235e08c25b398b1ff00417
+    .agents/plugins/marketplace.json: 6fb0471219b806f046b13a1d88e29afc42e62bcafb7a305b1df5a8fd4f05f79a

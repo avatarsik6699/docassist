@@ -38,11 +38,4 @@ retrieval:
 
 # context-update
 
-Canonical playbook:
-
-- `docs/workflows/context-update.md`
-
-Rules:
-
-- follow the workflow doc exactly
-- do not commit
+Execute the canonical playbook in [workflow/docs/playbooks/context-update.md](../../../../workflow/docs/playbooks/context-update.md). That file is the source of truth for the version-bump rules and the final report format.

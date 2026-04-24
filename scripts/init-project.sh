@@ -66,7 +66,7 @@ PROJECT_DISPLAY=$(to_display_name "$PROJECT_SLUG")
 DB_NAME=$(to_db_name "$PROJECT_SLUG")
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT_DIR="$(dirname "$SCRIPT_DIR")"
+ROOT_DIR="${SDD_PROJECT_ROOT:-$(dirname "$SCRIPT_DIR")}"
 cd "$ROOT_DIR"
 
 # ── idempotency guard ─────────────────────────────────────────────────────────
@@ -148,12 +148,11 @@ echo "  ✓ app/main.py"
 
 # ── frontend ──────────────────────────────────────────────────────────────────
 
-# Replace [PROJECT_NAME] in any Vue template under the frontend app (covers
-# pages, layouts, widgets — so new components added to the template don't
-# silently leak the placeholder).
+# Replace [PROJECT_NAME] in frontend route modules and styles so placeholders
+# do not leak into generated projects.
 while IFS= read -r -d '' file; do
   sedi "s|\[PROJECT_NAME\]|$PROJECT_DISPLAY|g" "$file"
-done < <(find frontend/app -type f -name '*.vue' -print0)
+done < <(find frontend/app -type f \( -name '*.tsx' -o -name '*.ts' -o -name '*.css' \) -print0)
 echo "  ✓ frontend/"
 
 # ── nginx/nginx.conf ──────────────────────────────────────────────────────────
@@ -201,15 +200,15 @@ echo "  ✓ docs/"
 
 # ── AGENTS.md ─────────────────────────────────────────────────────────────────
 
-tail -n +7 human-instructions/AGENTS.for-new-projects.md > AGENTS.md
+tail -n +7 workflow/project-files/AGENTS.md.template > AGENTS.md
 sedi "s|\[PROJECT_NAME\]|$PROJECT_DISPLAY|g" AGENTS.md
 echo "  ✓ AGENTS.md"
 
 # ── CLAUDE.md ─────────────────────────────────────────────────────────────────
-# Strip the 6-line template header from human-instructions/CLAUDE.for-new-projects.md,
+# Strip the 6-line template header from workflow/project-files/CLAUDE.md.template,
 # then replace [PROJECT_NAME] in the result.
 
-tail -n +7 human-instructions/CLAUDE.for-new-projects.md > CLAUDE.md
+tail -n +7 workflow/project-files/CLAUDE.md.template > CLAUDE.md
 sedi "s|\[PROJECT_NAME\]|$PROJECT_DISPLAY|g" CLAUDE.md
 echo "  ✓ CLAUDE.md"
 
@@ -226,7 +225,7 @@ fi
 leftovers=$(grep -rnE '\[PROJECT_NAME\]|\[PROJECT_DESCRIPTION\]|my-project|\bmyapp\b' \
   --include='*.py' --include='*.ts' --include='*.vue' --include='*.md' \
   --include='*.yml' --include='*.yaml' --include='*.toml' \
-  --exclude-dir=tmp --exclude-dir=human-instructions \
+  --exclude-dir=tmp --exclude-dir=workflow \
   --exclude-dir=.venv --exclude-dir=node_modules --exclude-dir=.git \
   . 2>/dev/null || true)
 

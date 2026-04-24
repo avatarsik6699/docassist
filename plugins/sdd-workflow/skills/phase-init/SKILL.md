@@ -39,13 +39,4 @@ retrieval:
 
 # phase-init
 
-Canonical playbook:
-
-- `docs/workflows/phase-init.md`
-
-Rules:
-
-- follow the workflow doc exactly
-- do not modify `docs/SPEC.md`
-- do not modify `docs/CONTEXT.md`
-- do not commit
+Execute the canonical playbook in [workflow/docs/playbooks/phase-init.md](../../../../workflow/docs/playbooks/phase-init.md). That file is the source of truth for all steps, rules, and the final report format.

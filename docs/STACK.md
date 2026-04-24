@@ -1,11 +1,7 @@
 ## Stack Guide
 
-> **Stack-specific companion to [README.md](../README.md).** This file documents the concrete
-> technologies, tools, and conventions of the reference implementation shipped with this template.
->
-> The SDD pipeline itself (phases, gates, skills, contracts) is stack-agnostic. Everything in
-> this file is replaceable when swapping stacks — future versions of this template will ship
-> the pipeline core and stack overlays as separate packages.
+> Stack-specific companion to the workflow docs. The SDD workflow remains stack-agnostic; this file
+> records the concrete commands and layout for the FastAPI + React Router SSR template.
 
 ---
 
@@ -14,7 +10,7 @@
 | Layer | Technology |
 |-------|-----------|
 | Backend | FastAPI, SQLAlchemy 2.0 async, Alembic, Pydantic v2, Python 3.13+ |
-| Frontend | Nuxt 4, Vue 3.5+, TypeScript, Pinia, Tailwind CSS, pnpm |
+| Frontend | React 19, React Router 7 framework mode, Vite, TypeScript, pnpm |
 | Database | PostgreSQL 18 |
 | Cache | Redis 8 |
 | Infra | Docker Compose, Nginx |
@@ -25,216 +21,127 @@
 ## Prerequisites
 
 ```bash
-docker --version        # Docker 24+
-docker compose version  # v2+
-uv --version            # any recent — https://docs.astral.sh/uv/getting-started/installation/
-node --version          # 22+
-pnpm --version          # 10+
+docker --version
+docker compose version
+uv --version
+node --version
+pnpm --version
 ```
-
-> **`uv` is required for `./scripts/init-project.sh`.** The init script regenerates `uv.lock`
-> after renaming the project in `pyproject.toml`; without it, `docker compose up --build`
-> fails with `Missing workspace member`.
 
 ---
 
 ## Initial setup
 
-After cloning and running `./scripts/init-project.sh`:
+After running `uv run sdd init --template fastapi-react-router --project-name <slug> <target-dir>`
+and then `./scripts/init-project.sh` inside the generated project:
 
 ```bash
-# 1. Review the generated environment
 $EDITOR .env
-
-# 2. Start the stack
 docker compose up --build
-# Backend:  http://localhost:8000
-# Frontend: http://localhost:3000
 ```
 
-`init-project.sh` already creates `.env`, injects fresh secrets, and rewrites template placeholders.
-Migrations run automatically on backend startup. Hot-reload is active for both services —
-changes in `app/` and `frontend/` are reflected immediately without restarting containers.
+Default local endpoints:
 
----
-
-## Local IDE / git-hook setup (one-time)
-
-These do not affect Docker — they set up your editor and git workflow.
-
-```bash
-# Python deps for IntelliSense / mypy
-uv sync --dev
-# VS Code: Ctrl+Shift+P → "Python: Select Interpreter" → .venv/bin/python
-
-# Frontend deps for TS / Vue IntelliSense
-cd frontend && pnpm install
-
-# Pre-commit hooks (ruff lint + format on every commit)
-uv run pre-commit install
-```
-
----
-
-## Default credentials
-
-```
-Email:    admin@example.com
-Password: changeme123
-```
-
-Change these in [alembic/versions/0001_users_table.py](../alembic/versions/0001_users_table.py) before going to production.
+- Backend API: `http://localhost:8000`
+- Frontend SSR app: `http://localhost:3000`
 
 ---
 
 ## Gate Commands
 
-This section is the authoritative command source for the phase-gate workflow. If the stack changes, update this table and keep the workflow wrappers untouched.
+This section is the human-readable command source for the phase-gate workflow. The machine-readable
+dispatch lives in `.sdd/template-manifest.yaml`.
 
 | Gate check | Command | Preconditions / notes |
 |------------|---------|-----------------------|
-| Infrastructure / bootstrap | `docker compose up -d` then `docker compose ps` | Use the repository `.env`. `db`, `redis`, `backend`, and `frontend` must be healthy; `nginx` must be running. |
-| Migrations | `docker compose exec -T backend uv run alembic upgrade head` | Run inside the backend container so `.env`-backed credentials stay aligned. |
-| Backend tests | `uv run pytest tests/ -v` | Run from the repo root. |
-| Frontend type generation / prep | `cd frontend && pnpm nuxt prepare` | Required before frontend type-checks and Vitest when `.nuxt/` is missing or stale. |
-| Frontend typecheck | `cd frontend && pnpm typecheck` | Depends on the prep step above. |
-| Frontend unit tests | `cd frontend && pnpm test` | Depends on the prep step above. |
-| E2E anti-flake lint | `cd frontend && pnpm test:e2e:lint` | Fails on committed `waitForTimeout(...)` usage in E2E specs. Debug-only waits must never be committed. |
-| E2E (deterministic gate) | `cd frontend && pnpm test:e2e --project=chromium` | Run against the full Docker stack. Chromium is the only pass/fail browser for gate + PR CI. JUnit output should land at `frontend/test-results/junit.xml`; HTML report at `frontend/playwright-report/index.html`. |
-| Smoke test | `curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/api/v1/health` | Phase files may override the endpoint and expected result with a phase-specific smoke target. |
+| Infrastructure / bootstrap | `docker compose up -d` then `docker compose ps` | `db`, `redis`, `backend`, and `frontend` must be healthy; `nginx` must be running. |
+| Migrations | `docker compose exec -T backend uv run alembic upgrade head` | Run inside the backend container. |
+| Backend tests | `uv run pytest tests/ -v` | Run from repo root. |
+| Frontend prep | `cd frontend && pnpm typecheck` | Validates the React Router app graph before frontend restart / E2E. |
+| Frontend unit tests | `cd frontend && pnpm test` | Runs Vitest against route modules. |
+| E2E anti-flake lint | `cd frontend && pnpm test:e2e:lint` | Fails on committed `waitForTimeout(...)`. |
+| E2E (deterministic gate) | `cd frontend && pnpm test:e2e --project=chromium` | Run against the full Docker stack. This is local-first and not part of the default CI workflow. |
+| Smoke test | `curl -sS http://localhost:8000/api/v1/health` | Phase files may override the target. |
 
-`./scripts/phase-gate.sh [XX]` is the preferred helper for this reference stack. It is an implementation of these gate commands, not a separate source of truth.
+`./scripts/phase-gate.sh [XX]` is the preferred helper for this template.
 
-## Testing
+---
 
-### Backend (pytest)
-SQLite in-memory by default. Set `DATABASE_URL` to run against Postgres (CI pattern).
-```bash
-uv run pytest
-```
+## Frontend commands
 
-### Frontend unit / component (Vitest)
-```bash
-cd frontend && pnpm test
-```
-
-Nuxt-generated types are required for both type-checking and Vitest. If `.nuxt/` is missing
-(common in CI or a fresh checkout), run:
-
-```bash
-cd frontend && pnpm nuxt prepare
-```
-
-### Frontend type-checking
 ```bash
 cd frontend
-pnpm nuxt prepare
+pnpm install
 pnpm typecheck
+pnpm test
+pnpm test:e2e:lint
+pnpm test:e2e --project=chromium
+pnpm build
+pnpm start
 ```
 
-### Frontend end-to-end (Playwright)
-E2E runs against the full Docker stack.
+## Manual browser investigation (Playwright CLI, opt-in)
+
+Use this only for explicit manual debugging requests when deterministic tests do not expose a browser issue.
+It is not part of default gate automation.
+
 ```bash
 cd frontend
-pnpm test:e2e:install   # first time only — downloads browsers
-pnpm test:e2e:lint      # anti-flake policy check
-pnpm test:e2e --project=chromium  # deterministic gate path
-pnpm test:e2e:all                 # optional exploratory cross-browser run
+
+# One-off interactive browser session
+pnpm playwright:cli -- open http://localhost:3000 --headed
+
+# Inspect elements available for interaction
+pnpm playwright:cli -- snapshot
+
+# Capture evidence while reproducing a bug
+pnpm playwright:cli -- screenshot
 ```
 
-Reports:
-- CLI: `list` reporter (inline)
-- HTML: `frontend/playwright-report/index.html`
-- JUnit: `frontend/test-results/junit.xml` (parsed by `/phase-gate`)
-- Traces: stored in `frontend/test-results/` for failed retries (`trace: on-first-retry`)
+Prefer `pnpm test:e2e --project=chromium` for deterministic pass/fail checks, and convert manual findings into E2E specs when possible.
 
-Determinism rules:
-- Prefer `getByRole`, `getByLabel`, and `getByTestId` selectors.
-- Use Playwright web-first assertions (`await expect(...)`) for readiness; do not use fixed sleeps.
-- Use deterministic setup/fixtures with unique per-test data; never depend on leftovers from previous runs.
-- Keep login behavior tests explicit, and use setup-storage state for post-auth flows.
-- Add at least one E2E spec for each user-facing flow introduced in a phase.
+## Manual response compression (Caveman, opt-in)
 
-### CI and branch protection
+Use this only when you explicitly want shorter agent output to reduce token usage in long debugging loops.
+It is not part of `phase-gate`.
 
-- CI includes a dedicated required job: `E2E (Chromium)` on pull requests.
-- Configure branch protection in derived repositories so this job is required before merge.
-- Keep the `CI` workflow as the single required PR path for Playwright in derived repositories (no duplicate standalone Playwright workflow unless intentionally non-gating).
-- Use [E2E Pipeline Checklist](./E2E_PIPELINE_CHECKLIST.md) when setting up branch protection and pull-request templates.
+```bash
+# Install once in the project
+./scripts/install-caveman.sh
 
-### E2E troubleshooting
+# Activate only when needed in a session
+/caveman
+# Codex trigger:
+$caveman
+```
 
-- Startup failures: inspect `docker compose ps` first; do not run Playwright until all services are healthy.
-- Health-check drift: if `frontend` or `backend` checks fail, verify exposed ports and container health commands.
-- Base URL mismatch: set `PLAYWRIGHT_BASE_URL` if running outside the default Docker URL.
-- Auth-state corruption: delete `frontend/tests/e2e/.auth/` and rerun setup.
-- Hydration race on SSR pages: fixture helpers should wait for app readiness (`html[data-app-ready="true"]`) before typing/clicking form controls.
-- Artifact-first triage: inspect `frontend/playwright-report/index.html`, JUnit, and traces before changing assertions.
+Notes:
+- Keep default project policy in normal response mode.
+- Prefer normal mode for final docs, contracts, and handoff notes.
 
-Full testing guidelines, including `data-testid` conventions and per-flow spec requirements, live in [../frontend/README.md](../frontend/README.md#testing).
+React Router SSR is enabled in `frontend/react-router.config.ts`. Route modules use `meta()`
+exports for document title and SEO metadata.
 
 ---
 
 ## Project structure
 
-```
+```text
 .
-├── .claude/skills/         # SDD pipeline skills (spec-sync, phase-init, phase-gate, context-update)
-├── app/                    # FastAPI backend — see app/README.md
-│   ├── api/v1/             # Routers grouped by resource
-│   ├── core/               # config.py (Pydantic Settings), auth.py (JWT + role guards)
-│   ├── db/                 # base.py, session.py, models/
-│   └── schemas/            # Pydantic request/response models
-├── alembic/                # DB migrations (autogenerated + hand-edited for seed / enum DDL)
-├── frontend/               # Nuxt 4 app (Feature-Sliced Design) — see frontend/README.md
-│   └── app/
-│       ├── pages/          # Nuxt auto-routing
-│       ├── layouts/        # App shell templates
-│       ├── middleware/     # Route guards
-│       ├── plugins/        # HTTP client init
-│       ├── widgets/        # Composite UI blocks (auto-imported)
-│       ├── features/       # User-facing feature slices
-│       └── shared/         # api/, lib/, model/, types/ — zero business logic
-├── tests/                  # pytest integration tests
-├── docs/                   # SPEC, CONTEXT, STATE, CHANGELOG, PHASE_XX, STACK (this file)
+├── app/                    # FastAPI backend
+├── alembic/                # DB migrations
+├── frontend/               # React Router SSR frontend
+│   ├── app/
+│   │   ├── root.tsx
+│   │   ├── routes.ts
+│   │   └── routes/
+│   └── tests/
+├── tests/                  # pytest backend tests
+├── docs/                   # SPEC, CONTEXT, STATE, CHANGELOG, PHASE_XX, STACK
 ├── docker-compose.yml
 ├── Dockerfile.backend
 ├── Dockerfile.frontend
-├── nginx.conf
-├── pyproject.toml
-├── .env.example
-└── AGENTS.md / CLAUDE.md   # AI agent rules (scope lock, gates, docs lookup, permission handoff)
+└── AGENTS.md / CLAUDE.md
 ```
 
----
-
-## Per-module style guides
-
-Before editing code under `app/` or `frontend/`, read the local style guide:
-
-- Backend: [../app/README.md](../app/README.md) — ruff/mypy config, naming, key patterns (async session, role guards, Pydantic Settings)
-- Frontend: [../frontend/README.md](../frontend/README.md) — FSD layers, auto-imports, Pinia conventions, E2E expectations
-
-Both local guides repeat two load-bearing rules (docs lookup and permission-denied handoff) because an AI editing inside those subtrees often won't open the root [AGENTS.md](../AGENTS.md) or [CLAUDE.md](../CLAUDE.md).
-
----
-
-## Common operations
-
-### Add a new migration
-```bash
-uv run alembic revision --autogenerate -m "add_your_table"
-uv run alembic upgrade head
-```
-
-### Stop everything
-```bash
-docker compose down       # stop containers, keep data
-docker compose down -v    # stop containers + delete postgres volume
-```
-
-### Regenerate OpenAPI types for the frontend
-```bash
-cd frontend && pnpm generate:api
-```
-Overwrites `frontend/app/shared/types/schema.ts` from the backend OpenAPI spec.
+Before editing the frontend, read [../frontend/README.md](../frontend/README.md).

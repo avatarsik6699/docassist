@@ -1,23 +1,14 @@
 ---
 name: phase-init
-description: Scaffold a new PHASE_XX.md by following the canonical workflow playbook.
+description: Scaffold a new PHASE_XX.md from PHASE_TEMPLATE.md. Fills metadata, scope, Contracts, and Files by extracting data from SPEC.md. Adds the phase row to STATE.md.
 allowed-tools: Read, Write, Glob
 argument-hint: "[phase number, e.g. 02]"
 ---
 
-# phase-init
+You are running the SDD `phase-init` workflow.
 
-Read and follow the canonical playbook:
+**Target phase**: $ARGUMENTS
 
-- `docs/workflows/phase-init.md`
+Execute the canonical playbook in [workflow/docs/playbooks/phase-init.md](../../../workflow/docs/playbooks/phase-init.md). That file is the source of truth for all steps, inputs, rules, and the final report format.
 
-Inputs:
-
-- target phase number from `$ARGUMENTS`
-
-Rules:
-
-- use `docs/workflows/phase-init.md` as the source of truth
-- never modify `docs/SPEC.md`
-- never modify `docs/CONTEXT.md`
-- do not commit automatically
+If `$ARGUMENTS` is empty, ask: "Which phase number? Usage: /phase-init 02".

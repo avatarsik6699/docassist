@@ -1,12 +1,11 @@
 ---
 name: phase-gate
-description: Run the full SDD gate for a phase by following the canonical workflow playbook and stack gate command table.
+description: Run the full SDD gate for a phase: infrastructure checks, tests, e2e, smoke verification, and architect review notes verification. Use when the user asks whether a phase is ready to commit.
 metadata:
   priority: 5
   pathPatterns:
     - 'docs/PHASE_*.md'
     - 'docs/STATE.md'
-    - 'docs/STACK.md'
     - 'frontend/playwright.config.ts'
     - 'frontend/test-results/**'
     - 'frontend/playwright-report/**'
@@ -47,21 +46,6 @@ retrieval:
 
 # phase-gate
 
-Canonical playbook:
+Execute the canonical playbook in [workflow/docs/playbooks/phase-gate.md](../../../../workflow/docs/playbooks/phase-gate.md). Resolve the active gate helper/docs pair with `sdd gate resolve`; `docs/STACK.md#gate-commands` remains the human-readable command source.
 
-- `docs/workflows/phase-gate.md`
-
-Stack command source:
-
-- `docs/STACK.md#gate-commands`
-
-Preferred helper:
-
-- `./scripts/phase-gate.sh [XX]`
-
-Rules:
-
-- follow the workflow doc exactly
-- treat `docs/STACK.md` as authoritative for commands
-- do not edit code
-- do not commit
+Read-only: do not edit code, do not commit. Do not return PASS while unchecked architect review notes remain.

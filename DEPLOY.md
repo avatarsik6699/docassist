@@ -2,7 +2,7 @@
 
 Полный линейный флоу: от чистого сервера до работающего HTTPS-приложения и последующих обновлений через GitHub Actions.
 
-**Стек:** FastAPI (`:8000`) + Nuxt 3 SSR (`:3000`) + PostgreSQL + Redis + Nginx (`:80`/`:443`) + Let's Encrypt
+**Стек:** FastAPI (`:8000`) + React Router SSR (`:3000`) + PostgreSQL + Redis + Nginx (`:80`/`:443`) + Let's Encrypt
 
 ---
 
@@ -57,7 +57,7 @@ sudo ufw enable          # включить файрвол
 sudo ufw status          # проверить
 ```
 
-> **Важно:** Порты 5432 (PostgreSQL), 6379 (Redis), 8000 (FastAPI), 3000 (Nuxt) **не открывать** — они видны только внутри Docker-сети. В production-конфиге они не пробрасываются на хост.
+> **Важно:** Порты 5432 (PostgreSQL), 6379 (Redis), 8000 (FastAPI), 3000 (React Router app) **не открывать** — они видны только внутри Docker-сети. В production-конфиге они не пробрасываются на хост.
 
 > **Подводный камень:** Если не открыть порт 22 до `ufw enable` — потеряете SSH-доступ. Провайдер VPS предоставляет аварийную веб-консоль для восстановления.
 
@@ -178,7 +178,8 @@ APP_ENV=production
 # Домен
 DOMAIN=ваш-домен.ru
 
-# URL API для браузера (клиентский рендер)
+# URL API для браузера (обязательно с префиксом /api/v1 —
+# иначе код, добавляющий его вручную, сгенерирует /api/api/v1/...).
 API_BASE_URL=https://ваш-домен.ru/api/v1
 
 # URL API для SSR внутри Docker-сети
@@ -300,7 +301,7 @@ ss -tlnp | grep -E '5432|6379|8000|3000'
 
 ```bash
 docker compose logs -f backend    # FastAPI + Alembic миграции
-docker compose logs -f frontend   # Nuxt SSR
+docker compose logs -f frontend   # React Router SSR
 docker compose logs -f nginx      # доступ и ошибки
 docker compose logs -f db         # PostgreSQL
 ```
@@ -493,13 +494,13 @@ docker compose restart backend
 
 ---
 
-### Nuxt: API-запросы в браузере падают (Network Error / 404)
+### React Router app: API-запросы в браузере падают (Network Error / 404)
 
 **Причина:** `API_BASE_URL` указывает на `localhost` (dev-значение из `.env.example`).
 
 **Решение:**
 ```bash
-# В .env на сервере:
+# В .env на сервере — префикс /api/v1 обязателен:
 API_BASE_URL=https://ваш-домен.ru/api/v1
 
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build frontend

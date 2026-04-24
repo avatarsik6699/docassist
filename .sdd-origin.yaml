@@ -1,0 +1,19 @@
+project_metadata_version: '0.1'
+generated_at: '2026-04-24T19:26:13Z'
+project:
+  slug: docassist
+  display_name: Docassist
+  path: /home/niquetamerewsl/projects/docassist
+source:
+  repository: https://github.com/avatarsik6699/sdd-template.git
+  revision: 8f38d2d258f0b4385bec6ff232971801478c3ea8
+  describe: template/fastapi-nuxt/v0.1.0-17-g8f38d2d
+workflow:
+  version: template/fastapi-nuxt/v0.1.0-17-g8f38d2d
+  source_subdir: workflow
+template:
+  id: fastapi-react-router
+  display_name: FastAPI + React Router SSR Reference Stack
+  version: 0.1.0
+  manifest_schema_version: '0.1'
+  source_subdir: templates/fastapi-react-router

@@ -1,5 +1,2 @@
-User-Agent: *
-Disallow:
+User-agent: *
 Allow: /
-
-Sitemap: /sitemap.xml

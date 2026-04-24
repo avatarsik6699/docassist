@@ -47,7 +47,7 @@ ADMIN_EMAIL="${2:-admin@$DOMAIN}"
 # ── locate project root ────────────────────────────────────────────────────────
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT_DIR="$(dirname "$SCRIPT_DIR")"
+ROOT_DIR="${SDD_PROJECT_ROOT:-$(dirname "$SCRIPT_DIR")}"
 cd "$ROOT_DIR"
 
 # ── preflight ─────────────────────────────────────────────────────────────────

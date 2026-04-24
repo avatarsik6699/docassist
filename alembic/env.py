@@ -16,7 +16,7 @@ target_metadata = Base.metadata
 
 DATABASE_URL = os.environ.get(
     "DATABASE_URL",
-    "postgresql+asyncpg://app_user:changeme@localhost:5432/docassist",
+    "postgresql+asyncpg://app_user:changeme@localhost:5432/myapp",
 )
 
 

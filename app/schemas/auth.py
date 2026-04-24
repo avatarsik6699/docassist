@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from pydantic import BaseModel
+from uuid import UUID
+
+from pydantic import BaseModel, ConfigDict
 
 
 class LoginRequest(BaseModel):
@@ -13,5 +15,10 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
 
 
-class LogoutResponse(BaseModel):
-    message: str = "logged out"
+class UserOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    email: str
+    role: str
+    is_active: bool
