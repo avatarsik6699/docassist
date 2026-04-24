@@ -130,11 +130,17 @@ exports for document title and SEO metadata.
 .
 ├── app/                    # FastAPI backend
 ├── alembic/                # DB migrations
-├── frontend/               # React Router SSR frontend
+├── frontend/               # React Router SSR frontend (FSD)
 │   ├── app/
-│   │   ├── root.tsx
-│   │   ├── routes.ts
-│   │   └── routes/
+│   │   ├── root.tsx           # RR7 root layout (unchanged)
+│   │   ├── routes.ts          # RR7 route registry (unchanged)
+│   │   ├── routes/            # Thin stubs: meta() + delegate to pages/
+│   │   ├── pages/             # FSD: full page compositions
+│   │   ├── widgets/           # FSD: composite UI blocks
+│   │   ├── features/          # FSD: feature slices (auth/, etc.)
+│   │   ├── entities/          # FSD: business entities (user/, etc.)
+│   │   ├── shared/            # FSD: utilities, API client, types, UI atoms
+│   │   └── styles/
 │   └── tests/
 ├── tests/                  # pytest backend tests
 ├── docs/                   # SPEC, CONTEXT, STATE, CHANGELOG, PHASE_XX, STACK

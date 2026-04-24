@@ -62,10 +62,16 @@ alembic/versions/0001_users_table.py
 frontend/app/
 ├── root.tsx
 ├── routes.ts
-└── routes/
-    ├── home.tsx
-    ├── login.tsx
-    └── dashboard.tsx
+├── routes/
+│   ├── home.tsx           # meta() stub → delegates to pages/home
+│   ├── login.tsx          # meta() stub → delegates to pages/login
+│   └── dashboard.tsx      # meta() stub → delegates to pages/dashboard
+├── pages/
+│   ├── home/ui/home-page.tsx
+│   ├── login/ui/login-page.tsx
+│   └── dashboard/ui/dashboard-page.tsx
+├── features/auth/model/auth-store.ts   # Zustand useAuthStore
+└── entities/user/model/user.types.ts   # UserOut, LoginRequest, TokenResponse
 tests/
 ├── conftest.py
 ├── test_health.py
@@ -113,8 +119,12 @@ users(
 // UserOut
 { id: string; email: string; role: string; is_active: boolean }
 
-// Pinia: useAuthStore — login(), fetchMe(), logout(), token, user, isAuthenticated
-// Pinia: useUiStore   — UI state (sidebar, loading, etc.)
+// Zustand: useAuthStore — login(), fetchMe(), logout(), token, user, isAuthenticated
+// Zustand: useUiStore   — UI state (sidebar, loading, etc.)
+//
+// NOTE: Pinia is Vue-only and cannot be used in React. Use Zustand instead.
+// Add dependency before implementing: pnpm add zustand
+// Location: app/features/auth/model/auth-store.ts
 ```
 
 ### New env vars (add to `.env.example`)
