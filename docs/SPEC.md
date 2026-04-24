@@ -1,4 +1,4 @@
-# TECHNICAL SPECIFICATION (SPEC.md): `[PROJECT_NAME]`
+# TECHNICAL SPECIFICATION (SPEC.md): `Docassist`
 
 > **For AI agent**: Read this file in full before starting any phase.
 > Confirm understanding of constraints and the phased development model.

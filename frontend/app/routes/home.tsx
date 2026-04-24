@@ -1,9 +1,9 @@
 export function meta() {
   return [
-    { title: "[PROJECT_NAME]" },
+    { title: "Docassist" },
     {
       name: "description",
-      content: "[PROJECT_NAME] built on FastAPI and React Router SSR.",
+      content: "Docassist built on FastAPI and React Router SSR.",
     },
     {
       tagName: "link",
@@ -18,7 +18,7 @@ export default function HomeRoute() {
     <main className="shell">
       <div className="hero">
         <p className="eyebrow">SSR Reference Stack</p>
-        <h1>[PROJECT_NAME]</h1>
+        <h1>Docassist</h1>
         <p className="lede">
           FastAPI handles the API surface. React Router handles SSR, routing, and SEO metadata.
         </p>

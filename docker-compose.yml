@@ -5,7 +5,7 @@ services:
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-app_user}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
-      POSTGRES_DB: ${POSTGRES_DB:-myapp}
+      POSTGRES_DB: ${POSTGRES_DB:-docassist}
     volumes:
       # Postgres 18+ expects the parent directory to be mounted.
       - pgdata:/var/lib/postgresql

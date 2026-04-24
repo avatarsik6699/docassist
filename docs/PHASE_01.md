@@ -120,10 +120,10 @@ users(
 ### New env vars (add to `.env.example`)
 | Key | Example value | Required |
 |-----|---------------|----------|
-| `DATABASE_URL` | `postgresql+asyncpg://app_user:changeme@localhost:5432/myapp` | yes |
+| `DATABASE_URL` | `postgresql+asyncpg://app_user:changeme@localhost:5432/docassist` | yes |
 | `POSTGRES_USER` | `app_user` | yes |
 | `POSTGRES_PASSWORD` | `changeme` | yes |
-| `POSTGRES_DB` | `myapp` | yes |
+| `POSTGRES_DB` | `docassist` | yes |
 | `REDIS_URL` | `redis://localhost:6379/0` | yes |
 | `SECRET_KEY` | `<generate: python -c "import secrets; print(secrets.token_hex(32))">` | yes |
 | `ALGORITHM` | `HS256` | yes |
@@ -145,7 +145,7 @@ docker compose up -d db redis
 docker compose ps  # db + redis must show: healthy
 
 # 2. Migrations
-DATABASE_URL=postgresql+asyncpg://app_user:changeme@localhost:5432/myapp \
+DATABASE_URL=postgresql+asyncpg://app_user:changeme@localhost:5432/docassist \
   uv run alembic upgrade head
 
 # 3. Backend tests

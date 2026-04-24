@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     # Database
-    DATABASE_URL: str = "postgresql+asyncpg://app_user:changeme@localhost:5432/myapp"
+    DATABASE_URL: str = "postgresql+asyncpg://app_user:changeme@localhost:5432/docassist"
 
     # Auth
     SECRET_KEY: str = "CHANGE_ME"

@@ -167,7 +167,7 @@ nano .env
 ```bash
 # База данных
 POSTGRES_PASSWORD=<вывод openssl rand -hex 32>
-DATABASE_URL=postgresql+asyncpg://app_user:<пароль>@db:5432/myapp
+DATABASE_URL=postgresql+asyncpg://app_user:<пароль>@db:5432/docassist
 
 # Auth
 SECRET_KEY=<вывод python3 -c "import secrets; print(secrets.token_hex(32))">
@@ -400,10 +400,10 @@ docker system df       # место под Docker-данные
 ```bash
 # Создать бэкап
 docker compose exec -T db \
-  pg_dump -U app_user myapp > backup_$(date +%Y%m%d_%H%M%S).sql
+  pg_dump -U app_user docassist > backup_$(date +%Y%m%d_%H%M%S).sql
 
 # Восстановить
-cat backup.sql | docker compose exec -T db psql -U app_user -d myapp
+cat backup.sql | docker compose exec -T db psql -U app_user -d docassist
 ```
 
 ### SSL-сертификат
@@ -440,7 +440,7 @@ docker compose exec backend uv run alembic downgrade -1    # откатить п
 ### Доступ к БД напрямую
 
 ```bash
-docker compose exec db psql -U app_user -d myapp
+docker compose exec db psql -U app_user -d docassist
 ```
 
 ### Очистка Docker

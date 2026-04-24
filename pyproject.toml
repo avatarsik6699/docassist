@@ -1,7 +1,7 @@
 [project]
-name = "my-project"
+name = "docassist"
 version = "0.1.0"
-description = "[PROJECT_NAME] backend"
+description = "Docassist backend"
 requires-python = ">=3.13"
 dependencies = [
     "fastapi[standard]>=0.115.0",
