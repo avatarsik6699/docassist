@@ -98,6 +98,40 @@ Rules:
 - Keep it out of default gate automation (`phase-gate` still uses deterministic `playwright test`)
 - Convert validated manual findings into reproducible E2E specs where possible
 
+## shadcn AI Helpers (Skills + MCP)
+
+When working on UI tasks in `frontend`, use the shadcn AI tooling surface:
+
+```bash
+cd frontend
+
+# Project context for agents (framework, aliases, installed components)
+pnpm dlx shadcn@latest info --json
+
+# Find component docs/examples quickly
+pnpm dlx shadcn@latest docs button
+pnpm dlx shadcn@latest search @shadcn -q "login form"
+```
+
+Install shadcn skill support in compatible coding environments:
+
+```bash
+cd frontend
+pnpm dlx skills add shadcn/ui
+```
+
+Optional: connect the shadcn MCP server for registry browsing/install workflows.
+
+Codex config snippet (`~/.codex/config.toml`):
+
+```toml
+[mcp_servers.shadcn]
+command = "npx"
+args = ["shadcn@latest", "mcp"]
+```
+
+After editing MCP config, restart the agent runtime.
+
 ## Caveman (manual token-compression profile)
 
 Use Caveman only when you explicitly want compressed agent responses (for example long debugging loops).

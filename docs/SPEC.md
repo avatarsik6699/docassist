@@ -92,21 +92,27 @@ app/
 ### 5.1 Pages
 ```
 pages/
-├── dashboard.vue
-├── [feature]/index.vue
-└── [feature]/[id].vue
+├── home/ui/home-page.tsx
+├── login/ui/login-page.tsx
+└── dashboard/ui/dashboard-page.tsx
 ```
 
-### 5.2 Components and Stores
+### 5.2 Components and Client Layers
 ```
-components/
-├── ui/        (buttons, modals, toasts)
-└── [feature]/
-stores/        (Pinia: auth, ui, ...)
-composables/   (useApi, ...)
+app/components/ui/         (shadcn/ui local primitives)
+app/shared/lib/            (i18n init, providers, query client)
+app/features/*/model/      (feature-specific hooks, e.g. react-query hooks)
+app/shared/api/            (typed HTTP client)
 ```
 
-### 5.3 Design References
+### 5.3 Frontend UI/UX Baseline
+- Component system: `shadcn/ui` (Radix base, open code in repo)
+- Styling: Tailwind CSS v4 + CSS variables in `app/styles/app.css`
+- Dark mode: `next-themes` with class-based strategy
+- i18n: `i18next` + `react-i18next`
+- Server state: `@tanstack/react-query`
+
+### 5.4 Design References
 
 <!-- Screenshots attached during /spec-init. One entry per key screen.
      Format: `Screen name — brief description (route, key components, notable interactions)`

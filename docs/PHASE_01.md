@@ -33,6 +33,7 @@ Stand up the complete foundational infrastructure: Docker services, database wit
 
 ### Frontend
 - [ ] React Router SSR app starts without errors
+- [ ] UI baseline configured: Tailwind CSS v4 + shadcn/ui + next-themes + i18next
 - [ ] Page `/login` — login form (blank layout)
 - [ ] Page `/dashboard` — stub after login (default layout)
 - [ ] Auth guard: unauthenticated users redirect to `/login`
@@ -61,6 +62,8 @@ app/
 alembic/versions/0001_users_table.py
 frontend/app/
 ├── root.tsx
+├── components/ui/           # shadcn components (button/card/input/label)
+├── lib/utils.ts             # shadcn utility: cn()
 ├── routes.ts
 ├── routes/
 │   ├── home.tsx           # meta() stub → delegates to pages/home
@@ -70,6 +73,8 @@ frontend/app/
 │   ├── home/ui/home-page.tsx
 │   ├── login/ui/login-page.tsx
 │   └── dashboard/ui/dashboard-page.tsx
+├── shared/lib/app-provider.tsx # Root app providers composition
+├── shared/lib/i18n.ts          # i18next setup/resources
 ├── features/auth/model/auth-queries.ts # React Query hooks for auth flows
 └── entities/user/model/user.types.ts   # UserOut, LoginRequest, TokenResponse
 tests/
@@ -124,8 +129,11 @@ users(
 // - useMeQuery(token?)
 // - authQueryKeys.me
 //
-// Add dependency before implementing: pnpm add @tanstack/react-query
-// Location: app/features/auth/model/auth-queries.ts
+// UI stack baseline:
+// - @tanstack/react-query
+// - shadcn/ui + tailwindcss
+// - next-themes
+// - i18next + react-i18next
 ```
 
 ### New env vars (add to `.env.example`)

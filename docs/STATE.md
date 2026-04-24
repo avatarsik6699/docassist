@@ -56,5 +56,6 @@ None
 | Date   | Event                                         |
 |--------|-----------------------------------------------|
 | [DATE] | Project initialized from sdd-template         |
+| 2026-04-24 | Frontend UI baseline set: shadcn + tailwind + next-themes + i18n |
 
 <!-- Add entries: [date]: PHASE_N completed / spec changed / blocker resolved -->

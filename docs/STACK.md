@@ -11,6 +11,7 @@
 |-------|-----------|
 | Backend | FastAPI, SQLAlchemy 2.0 async, Alembic, Pydantic v2, Python 3.13+ |
 | Frontend | React 19, React Router 7 framework mode, Vite, TypeScript, pnpm |
+| Frontend UI | Tailwind CSS v4, shadcn/ui (Radix base), next-themes, i18next/react-i18next, TanStack React Query |
 | Database | PostgreSQL 18 |
 | Cache | Redis 8 |
 | Infra | Docker Compose, Nginx |
@@ -72,6 +73,7 @@ dispatch lives in `.sdd/template-manifest.yaml`.
 ```bash
 cd frontend
 pnpm install
+pnpm dlx shadcn@latest info --json
 pnpm typecheck
 pnpm test
 pnpm test:e2e:lint
@@ -122,6 +124,23 @@ Notes:
 React Router SSR is enabled in `frontend/react-router.config.ts`. Route modules use `meta()`
 exports for document title and SEO metadata.
 
+UI stack baseline in `frontend`:
+- Component system: `shadcn/ui` (local source in `app/components/ui`)
+- Styling tokens: Tailwind CSS + CSS variables in `app/styles/app.css`
+- Theme handling: `next-themes` (`class` strategy)
+- i18n: `i18next` + `react-i18next`
+- Server-state queries/mutations: `@tanstack/react-query`
+
+Useful shadcn/AI commands:
+
+```bash
+cd frontend
+pnpm dlx shadcn@latest add button card input label
+pnpm dlx shadcn@latest docs button
+pnpm dlx shadcn@latest search @shadcn -q "login form"
+pnpm dlx skills add shadcn/ui
+```
+
 ---
 
 ## Project structure
@@ -140,6 +159,8 @@ exports for document title and SEO metadata.
 │   │   ├── features/          # FSD: feature slices (auth/, etc.)
 │   │   ├── entities/          # FSD: business entities (user/, etc.)
 │   │   ├── shared/            # FSD: utilities, API client, types, UI atoms
+│   │   ├── components/ui/     # shadcn/ui local components
+│   │   ├── lib/               # shadcn utilities (e.g., cn)
 │   │   └── styles/
 │   └── tests/
 ├── tests/                  # pytest backend tests

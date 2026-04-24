@@ -6,6 +6,28 @@
 
 ---
 
+## v1.0 — 2026-04-24 — Frontend UI Baseline Standardized
+
+**Type**: arch-decision
+**Author**: AI agent (Codex)
+**Triggered by**: Request to standardize component system, dark theme, and i18n stack
+
+### Changes
+- Updated `SPEC.md` frontend section to remove stale Vue/Pinia placeholders and define React Router + shadcn baseline.
+- Updated `STACK.md` and `frontend/README.md` with the concrete UI stack and shadcn AI workflow commands.
+- Added decision record in `DECISIONS.md` for UI baseline (`shadcn/ui`, Tailwind v4, `next-themes`, `react-i18next`, React Query).
+- Added shadcn skills/MCP setup notes into `AGENT_SETUP.md`.
+
+### Affected Phases
+- PHASE_01 — frontend foundation now explicitly includes UI baseline initialization.
+
+### Contract Updates
+- No backend/API/DB contract changes.
+- No `CONTEXT.md` version bump required.
+
+### Notes
+- This is a frontend architecture alignment update; data and API contracts are unchanged.
+
 ## v0.1.0 — 2026-04-24 — First Published Template Release
 
 **Type**: addendum

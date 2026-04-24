@@ -1,39 +1,36 @@
 # Frontend
 
-React 19 + React Router framework mode with server-side rendering, organized as Feature-Sliced Design (FSD).
+React 19 + React Router framework mode with SSR, organized as Feature-Sliced Design (FSD).
+
+## UI baseline
+
+- Component system: `shadcn/ui` (Radix base, open-code components in repo)
+- Styling/theming: Tailwind CSS v4 + CSS variables
+- Dark mode: `next-themes` (`class` strategy)
+- Internationalization: `i18next` + `react-i18next`
+- Server state: `@tanstack/react-query`
 
 ## Layout
 
 ```text
 frontend/
 ├── app/
-│   ├── root.tsx              # RR7 root layout
-│   ├── routes.ts             # RR7 route registry (do not edit)
-│   ├── routes/               # Thin stubs: meta() export + delegate to pages/
-│   │   ├── home.tsx
-│   │   ├── login.tsx
-│   │   └── dashboard.tsx
-│   ├── pages/                # FSD: full page compositions
-│   │   ├── home/ui/
-│   │   ├── login/ui/
-│   │   └── dashboard/ui/
-│   ├── widgets/              # FSD: composite UI blocks
-│   ├── features/             # FSD: feature slices
-│   │   └── auth/model/
-│   ├── entities/             # FSD: business entities
-│   │   └── user/model/
-│   ├── shared/               # FSD: utilities, API, types, UI atoms
-│   │   ├── api/
-│   │   ├── lib/
-│   │   ├── types/
-│   │   └── ui/
-│   └── styles/app.css
+│   ├── root.tsx                # RR7 root layout
+│   ├── routes.ts               # RR7 route registry (do not edit)
+│   ├── routes/                 # Thin stubs: meta() export + delegate to pages/
+│   ├── pages/                  # FSD: full page compositions
+│   ├── widgets/                # FSD: composite UI blocks
+│   ├── features/               # FSD: feature slices
+│   ├── entities/               # FSD: business entities
+│   ├── shared/                 # FSD: API, libs, shared ui
+│   ├── components/ui/          # shadcn/ui local component primitives
+│   ├── lib/                    # shadcn shared utilities
+│   └── styles/app.css          # global styles + tailwind imports + theme tokens
 ├── public/
 ├── scripts/
 ├── tests/
-│   ├── home.test.tsx
-│   └── e2e/home.spec.ts
-├── react-router.config.ts    # do not edit
+├── components.json             # shadcn registry/project config
+├── react-router.config.ts      # do not edit
 ├── vite.config.ts
 └── playwright.config.ts
 ```
@@ -47,24 +44,34 @@ pnpm typecheck
 pnpm test
 pnpm test:e2e:lint
 pnpm test:e2e --project=chromium
-pnpm playwright:cli -- open http://localhost:3000 --headed
-cd ..
-./scripts/install-caveman.sh
 pnpm build
 pnpm start
 ```
 
+## shadcn / AI workflow
+
+```bash
+# Initialize/update shadcn project wiring
+pnpm dlx shadcn@latest init --template react-router
+
+# Add UI primitives
+pnpm dlx shadcn@latest add button card input label
+
+# Useful for agent context/debug
+pnpm dlx shadcn@latest info --json
+pnpm dlx shadcn@latest docs button
+pnpm dlx shadcn@latest search @shadcn -q "login form"
+
+# Optional: install shadcn skill into the current coding environment
+pnpm dlx skills add shadcn/ui
+```
+
 ## Conventions
 
-- Route modules under `app/routes/` are thin stubs. They export `meta()` (required for SSR/SEO) and a default component that delegates rendering to `app/pages/`.
+- Route modules under `app/routes/` are thin stubs. They export `meta()` and delegate rendering to `app/pages/`.
 - Never put business logic or heavy JSX in route modules.
-- FSD import rule — each layer may only import from layers below it:
-  `routes → pages → widgets → features → entities → shared`
-- Use path aliases for cross-layer imports: `@pages/`, `@widgets/`, `@features/`, `@entities/`, `@shared/`.
-- Relative imports are acceptable within a single slice (e.g., inside `features/auth/`).
-- No barrel `index.ts` files are required — import directly from the file (`@pages/home/ui/home-page`).
-- `app/routes.ts` and `react-router.config.ts` must never be edited as part of FSD work.
-- SSR-safe rendering only in `routes/` stubs and `root.tsx`.
-- Global styles stay in `app/styles/app.css`.
-- Use Playwright CLI only for explicit manual debugging requests; keep gate automation on deterministic Playwright test commands.
-- Use Caveman only as an explicit opt-in response compression mode (`./scripts/install-caveman.sh` + `/caveman` or `$caveman`), not as default project policy.
+- FSD import rule: `routes → pages → widgets → features → entities → shared`.
+- Use aliases for cross-layer imports: `@pages/`, `@widgets/`, `@features/`, `@entities/`, `@shared/`.
+- For shadcn internals, use `@/components/*` and `@/lib/*`.
+- `app/routes.ts` and `react-router.config.ts` must not be edited as part of FSD work.
+- Use Playwright CLI only for explicit manual debugging requests; keep gate automation deterministic.
