@@ -9,7 +9,7 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
-    "types": ["node", "vitest/globals"],
+    "types": ["node", "vite/client", "vitest/globals"],
     "baseUrl": ".",
     "paths": {
       "@shared/*": ["app/shared/*"],
