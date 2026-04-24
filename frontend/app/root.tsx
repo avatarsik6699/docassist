@@ -1,5 +1,7 @@
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 
+import { QueryProvider } from "@shared/lib/query-provider";
+
 import "./styles/app.css";
 
 export default function App() {
@@ -12,7 +14,9 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <Outlet />
+        <QueryProvider>
+          <Outlet />
+        </QueryProvider>
         <ScrollRestoration />
         <Scripts />
       </body>

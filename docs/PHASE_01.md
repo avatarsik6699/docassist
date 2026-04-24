@@ -70,7 +70,7 @@ frontend/app/
 │   ├── home/ui/home-page.tsx
 │   ├── login/ui/login-page.tsx
 │   └── dashboard/ui/dashboard-page.tsx
-├── features/auth/model/auth-store.ts   # Zustand useAuthStore
+├── features/auth/model/auth-queries.ts # React Query hooks for auth flows
 └── entities/user/model/user.types.ts   # UserOut, LoginRequest, TokenResponse
 tests/
 ├── conftest.py
@@ -108,7 +108,7 @@ users(
 | `GET`  | `/api/v1/auth/me` | JWT | `{"id": "...", "email": "...", "role": "..."}` |
 | `POST` | `/api/v1/auth/logout` | JWT | `{"message": "Logged out"}` |
 
-### New TypeScript types / Pinia stores
+### New TypeScript types / React Query hooks
 ```typescript
 // LoginRequest
 { email: string; password: string }
@@ -119,12 +119,13 @@ users(
 // UserOut
 { id: string; email: string; role: string; is_active: boolean }
 
-// Zustand: useAuthStore — login(), fetchMe(), logout(), token, user, isAuthenticated
-// Zustand: useUiStore   — UI state (sidebar, loading, etc.)
+// React Query hooks:
+// - useLoginMutation()
+// - useMeQuery(token?)
+// - authQueryKeys.me
 //
-// NOTE: Pinia is Vue-only and cannot be used in React. Use Zustand instead.
-// Add dependency before implementing: pnpm add zustand
-// Location: app/features/auth/model/auth-store.ts
+// Add dependency before implementing: pnpm add @tanstack/react-query
+// Location: app/features/auth/model/auth-queries.ts
 ```
 
 ### New env vars (add to `.env.example`)

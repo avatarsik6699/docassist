@@ -79,7 +79,7 @@ None
 | `GET` | `/api/v1/[path]` | JWT | `{"field": type}` |
 -->
 
-### New TypeScript types / Pinia stores
+### New TypeScript types / frontend query/client layer
 
 None
 <!-- Replace with typed code fences when this phase introduces any. -->

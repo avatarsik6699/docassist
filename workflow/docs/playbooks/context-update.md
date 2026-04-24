@@ -31,7 +31,7 @@ From the **Contracts** section, extract:
 
 - New DB tables / columns
 - New API endpoints
-- New TypeScript types / Pinia stores
+- New TypeScript types / frontend query-client layer
 - New env vars (key names only)
 
 If every Contracts subsection is `None`: no version bump needed. Skip to step 6 (STATE.md update).
