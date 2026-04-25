@@ -11,10 +11,7 @@
 
 ## Phase Status
 
-| Phase    | Status     | Tag    | Gate | Expert | Notes                  |
-|----------|------------|--------|------|--------|------------------------|
-| PHASE_01 | ⏳ pending | v0.1.0 | ⬜   | -      | Foundation & Core Data |
-
+<!-- No phases declared yet. Spec is being finalised; phases will be initialised via /phase-init N. -->
 <!-- Add new rows here via /phase-init N -->
 
 ---
@@ -57,5 +54,6 @@ None
 |--------|-----------------------------------------------|
 | [DATE] | Project initialized from sdd-template         |
 | 2026-04-24 | Frontend UI baseline set: shadcn + tailwind + next-themes + i18n |
+| 2026-04-25 | Backend restructured into modular DDD; PHASE_01 removed pending spec finalisation; CONTEXT bumped to v1.1 |
 
 <!-- Add entries: [date]: PHASE_N completed / spec changed / blocker resolved -->

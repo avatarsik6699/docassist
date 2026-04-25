@@ -1,14 +1,22 @@
 {
   "_meta": {
-    "version": "v1.0",
+    "version": "v1.1",
     "format": "SDD CONTEXT.md — Single Source of Truth for AI agent",
     "update_rule": "Bump version on schema/API/type changes. Use /context-update skill after each phase.",
     "version_scheme": "patch (v1.0→v1.1) = additive only; minor (v1.1→v1.2) = breaking change"
   },
 
-  "captured_at": "[DATE]",
+  "captured_at": "2026-04-25",
   "phase_completed": null,
   "phase_in_progress": null,
+
+  "backend_architecture": {
+    "style": "Modular DDD",
+    "layout": "app/{core,db,shared}/ + app/modules/<bounded-context>/ + app/api/v1/router.py",
+    "module_layout": "api.py, service.py, repository.py, models.py, schemas.py, dependencies.py, exceptions.py, constants.py, config.py, utils.py",
+    "modules": ["users", "auth", "health"],
+    "import_rules": "Cross-module imports only through `app.modules.<name>` package root; modules → shared, core, db; core/shared never import modules; cross-module DB joins forbidden — call the other module's service via Depends."
+  },
 
   "stack": {
     "db_engine": "PostgreSQL 18 alpine",

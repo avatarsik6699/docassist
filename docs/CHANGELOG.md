@@ -6,6 +6,37 @@
 
 ---
 
+## v1.1 — 2026-04-25 — Backend Restructured to Modular DDD
+
+**Type**: arch-decision
+**Author**: AI agent (Claude)
+**Triggered by**: Architect request to replace the layered `api/core/db/services/schemas` layout with bounded contexts before further endpoints land.
+
+### Changes
+- `SPEC.md` §4.1 rewritten: backend layout is now `app/{core,db,shared}/` + `app/modules/<name>/` + `app/api/v1/router.py`, with explicit layering and import rules.
+- New backend layout in code: `app/modules/users/` (owns `User`, `UserRole`, `UserService`, `UserRepository`), `app/modules/auth/` (owns JWT utils, `AuthService`, `get_current_user`, `require_role`), `app/modules/health/`.
+- Service + repository layers introduced; route handlers no longer issue SQL or hash passwords directly.
+- Old paths removed: `app/api/v1/{auth,health}.py`, `app/db/models/`, `app/schemas/`, `app/core/auth.py`. The duplicate `Role` enum is gone — `users.UserRole` is the single source of truth.
+- `app/core/` split into `config.py`, `constants.py`, `exceptions.py` (`AppException` base), `logging.py`, `middleware.py`.
+- Domain exceptions inherit from `AppException` (subclass of `HTTPException`); FastAPI renders status/headers automatically.
+- `alembic/env.py` now imports `app.modules.users` to register ORM metadata.
+- `docs/PHASE_01.md` removed — the phase had not started and SPEC was not yet finalised.
+
+### Affected Phases
+- All future phases — module layout is the new baseline. New domains (documents, sessions, notifications, …) must be added as `app/modules/<name>/` with the standard internal layout.
+
+### Contract Updates
+- `CONTEXT.md` bumped from `v1.0` to `v1.1` (minor — backend structure breaking change for code, but REST contract unchanged).
+- REST endpoints unchanged: `GET /api/v1/health`, `POST /api/v1/auth/login`, `GET /api/v1/auth/me`, `POST /api/v1/auth/logout`.
+- DB schema unchanged (single `users` table, migration `0001_users_table` still head).
+
+### Notes
+- Module boundaries are enforced by convention + code review, not import-linter (decision deferred until repeated violations appear).
+- `auth → users` is the only cross-module dependency today. Reverse direction is forbidden.
+- Tests updated to import `User`, `UserRole` from `app.modules.users` and JWT helpers from `app.modules.auth`.
+
+---
+
 ## v1.0 — 2026-04-24 — Frontend UI Baseline Standardized
 
 **Type**: arch-decision

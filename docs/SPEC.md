@@ -62,14 +62,35 @@ table_name(id UUID PK, field1 TYPE NOT NULL, field2 TYPE, created_at TIMESTAMPTZ
 ## 4. API and Backend (FastAPI + Python)
 
 ### 4.1 Architecture
+
+The backend follows a **modular DDD layout**: each bounded context (domain) is a
+self-contained module that owns its models, repositories, services, routes, and
+local types. Cross-cutting infrastructure lives outside the modules.
+
 ```
 app/
-├── api/v1/     (routers: ...)
-├── core/       (config, auth, exceptions)
-├── db/         (async_session, models, alembic)
-├── services/   (domain services)
-└── schemas/    (Pydantic v2 request/response)
+├── main.py              composition root: FastAPI app, lifespan, middleware, router
+├── core/                framework infrastructure (config, constants, exceptions, logging, middleware)
+├── db/                  declarative Base + mixins, async engine, get_db
+├── shared/              domain-agnostic reusables (envelopes, types, generic deps)
+├── api/v1/router.py     aggregator that includes every module's APIRouter under /api/v1
+└── modules/             bounded contexts
+    ├── users/           User table, profile, roles
+    └── auth/            login, JWT, password hashing, get_current_user, require_role
 ```
+
+Each module contains: `api.py`, `service.py`, `repository.py`, `models.py`,
+`schemas.py`, `dependencies.py`, `exceptions.py`, `constants.py`, `config.py`,
+`utils.py`, and an `__init__.py` that re-exports the module's public API.
+
+#### Layering and import rules
+- Allowed direction: `modules → shared, core, db`; `shared → core`; `db → core`.
+- Cross-module imports go **only** through the package root
+  (`from app.modules.users import UserService`); reaching into another module's
+  `repository`, `models`, or `utils` is forbidden.
+- `core` and `shared` never import from `modules`.
+- Each module owns its tables; cross-module DB joins are forbidden — call the
+  other module's service via `Depends`.
 
 ### 4.2 Core Endpoints
 | Method | Path | Auth | Description |
